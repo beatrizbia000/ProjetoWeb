@@ -3,4 +3,7 @@
 @theme {
   --color-bg-login: #d8eeff;
   --color-header: #005a9c;
+
+  --color-footer: #004A8D;
+  --color-bg-light: #f8f9fa;
 }

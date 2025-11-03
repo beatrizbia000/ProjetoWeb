@@ -112,7 +112,7 @@ export default function Cadastro() {
 
     } catch (err) {
       if (err.response && err.response.status === 409) {
-        setError("Este email (matrícula) já está cadastrado.");
+        setError("Este email já está cadastrado.");
       } else {
         setError("Erro ao tentar cadastrar. Tente novamente.");
       }
@@ -151,7 +151,7 @@ export default function Cadastro() {
             </div>
             <div className="flex flex-col gap-1">
               <label className="text-black text-base font-medium font-['Inter']">
-                Matrícula (Email)
+                  Email
               </label>
               <input
                 className="px-3 py-2 bg-indigo-50 rounded-[20px] outline outline-1 outline-stone-300"

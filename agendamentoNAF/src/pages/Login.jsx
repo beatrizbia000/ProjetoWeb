@@ -37,7 +37,7 @@ export default function Login() {
     } catch (err) {
       
       if (err.response && (err.response.status === 401 || err.response.status === 404)) {
-        setError("Matrícula (email) ou senha inválidos.");
+        setError("Email ou senha inválidos.");
       } else if (err.response && err.response.status === 403) {
          setError(`Usuário bloqueado. Fim do bloqueio: ${err.response.data.data_fim_bloqueio}`);
       } else {
