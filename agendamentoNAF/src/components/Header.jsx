@@ -4,7 +4,7 @@ export default function Header() {
   const [isOpen, setIsOpen] = useState(false);
 
   return (
-    <header className="w-full bg-header">
+    <header className="w-full bg-primary">
       <div className="flex items-center justify-between px-6 h-20">
         {/* LOGO */}
         <h1 className="text-white text-2xl font-semibold">Agendamentos NAF</h1>
