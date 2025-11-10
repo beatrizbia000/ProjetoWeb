@@ -7,7 +7,7 @@ export default function Header() {
     <header className="w-full bg-primary">
       <div className="flex items-center justify-between px-6 h-20">
         {/* LOGO */}
-        <h1 className="text-white text-2xl font-semibold">Agendamentos NAF</h1>
+        <h1 className="text-black text-2xl font-semibold">Agendamentos NAF</h1>
 
         {/* BOTÃO MOBILE */}
         <button
@@ -51,13 +51,13 @@ export default function Header() {
 
         {/* LINKS (DESKTOP) */}
         <nav className="hidden md:flex items-center gap-10">
-          <a href="#" className="text-white font-semibold ">
+          <a href="#" className="text-black font-semibold ">
             Novo Agendamento
           </a>
-          <a href="#" className="text-white font-semibold ">
+          <a href="#" className="text-black font-semibold ">
             Meus Agendamentos
           </a>
-          <a href="#" className="text-white font-semibold ">
+          <a href="#" className="text-black font-semibold ">
             Meu Perfil
           </a>
         </nav>
@@ -67,13 +67,13 @@ export default function Header() {
       {isOpen && (
         <div className="md:hidden bg-header border-t border-white/10">
           <nav className="flex flex-col items-start gap-3 p-4">
-            <a href="#" className="text-white font-semibold text-sm">
+            <a href="#" className="text-black font-semibold text-sm">
               Novo Agendamento
             </a>
-            <a href="#" className="text-white font-semibold text-sm">
+            <a href="#" className="text-black font-semibold text-sm">
               Meus Agendamentos
             </a>
-            <a href="#" className="text-white font-semibold text-sm">
+            <a href="#" className="text-black font-semibold text-sm">
               Meu Perfil
             </a>
           </nav>
