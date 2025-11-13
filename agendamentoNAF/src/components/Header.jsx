@@ -1,13 +1,14 @@
 import { useState } from "react";
+import { Link } from "react-router-dom"; // importa o link
 
 export default function Header() {
   const [isOpen, setIsOpen] = useState(false);
 
   return (
-    <header className="w-full bg-primary">
+    <header className="w-full bg-[#004A8D] pb-0">
       <div className="flex items-center justify-between px-6 h-20">
         {/* LOGO */}
-        <h1 className="text-black text-2xl font-semibold">Agendamentos NAF</h1>
+        <h1 className="text-white text-2xl font-semibold">Agendamentos NAF</h1>
 
         {/* BOTÃO MOBILE */}
         <button
@@ -51,15 +52,15 @@ export default function Header() {
 
         {/* LINKS (DESKTOP) */}
         <nav className="hidden md:flex items-center gap-10">
-          <a href="#" className="text-black font-semibold ">
+          <Link to="/home" className="text-white font-semibold ">
             Novo Agendamento
-          </a>
-          <a href="#" className="text-black font-semibold ">
+          </Link>
+          <Link to="/home" className="text-white font-semibold ">
             Meus Agendamentos
-          </a>
-          <a href="#" className="text-black font-semibold ">
+          </Link>
+          <Link to="/perfil" className="text-white font-semibold ">
             Meu Perfil
-          </a>
+          </Link>
         </nav>
       </div>
 
@@ -67,15 +68,29 @@ export default function Header() {
       {isOpen && (
         <div className="md:hidden bg-header border-t border-white/10">
           <nav className="flex flex-col items-start gap-3 p-4">
-            <a href="#" className="text-black font-semibold text-sm">
+            <Link
+              to="/home"
+              className="text-black font-semibold text-sm"
+              onClick={() => setIsOpen(false)}
+            >
               Novo Agendamento
-            </a>
-            <a href="#" className="text-black font-semibold text-sm">
+            </Link>
+
+            <Link
+              to="/home"
+              className="text-black font-semibold text-sm"
+              onClick={() => setIsOpen(false)}
+            >
               Meus Agendamentos
-            </a>
-            <a href="#" className="text-black font-semibold text-sm">
+            </Link>
+
+            <Link
+              to="/perfil"
+              className="text-black font-semibold text-sm"
+              onClick={() => setIsOpen(false)}
+            >
               Meu Perfil
-            </a>
+            </Link>
           </nav>
         </div>
       )}
