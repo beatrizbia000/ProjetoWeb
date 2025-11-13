@@ -1,34 +1,56 @@
-const pool = require('../config/db');
+// Beck-end/models/tipoServico.model.js
+const TipoServicoDAO = require('../dao/tipoServico.dao');
 
 const TipoServicoModel = {
+  
   create: async ({ nome_servico }) => {
-    const sql = 'INSERT INTO TIPOS_SERVICO (nome_servico) VALUES (?)';
-    const [result] = await pool.query(sql, [nome_servico]);
-    return { id: result.insertId, nome_servico };
+    try {
+        const result = await TipoServicoDAO.insert(nome_servico);
+        return { id: result.insertId, nome_servico };
+    } catch (error) {
+        console.error('Erro na Model ao criar serviço:', error);
+        throw error;
+    }
   },
 
   findAll: async () => {
-    const sql = 'SELECT * FROM TIPOS_SERVICO';
-    const [rows] = await pool.query(sql);
-    return rows;
+    try {
+        return await TipoServicoDAO.selectAll();
+    } catch (error) {
+        console.error('Erro na Model ao listar serviços:', error);
+        throw error;
+    }
   },
 
   findById: async (id) => {
-    const sql = 'SELECT * FROM TIPOS_SERVICO WHERE id = ?';
-    const [rows] = await pool.query(sql, [id]);
-    return rows[0];
+    try {
+        return await TipoServicoDAO.selectById(id);
+    } catch (error) {
+        console.error('Erro na Model ao buscar serviço por ID:', error);
+        throw error;
+    }
   },
 
   update: async (id, { nome_servico }) => {
-    const sql = 'UPDATE TIPOS_SERVICO SET nome_servico = ? WHERE id = ?';
-    const [result] = await pool.query(sql, [nome_servico, id]);
-    return result.affectedRows;
+    try {
+        const result = await TipoServicoDAO.update(id, nome_servico);
+        return result.affectedRows;
+    } catch (error) {
+        console.error('Erro na Model ao atualizar serviço:', error);
+        throw error;
+    }
   },
 
   remove: async (id) => {
-    const sql = 'DELETE FROM TIPOS_SERVICO WHERE id = ?';
-    const [result] = await pool.query(sql, [id]);
-    return result.affectedRows;
+    try {
+        const result = await TipoServicoDAO.delete(id);
+        return result.affectedRows;
+    } catch (error) {
+        // Lógica de negócio: você pode adicionar aqui o tratamento para 'ER_ROW_IS_REFERENCED_2'
+        // igual fez no TipoUsuario, caso um serviço já esteja agendado.
+        console.error('Erro na Model ao remover serviço:', error);
+        throw error;
+    }
   }
 };
 

@@ -1,58 +1,54 @@
-const pool = require('../config/db');
+// Beck-end/models/tipoUsuario.model.js
+const TipoUsuarioDAO = require('../dao/tipoUsuario.dao');
 
 const TipoUsuarioModel = {
+  
   create: async ({ nome }) => {
     try {
-      const sql = 'INSERT INTO TIPOS_USUARIO (nome) VALUES (?)';
-      const [result] = await pool.query(sql, [nome]);
+      const result = await TipoUsuarioDAO.insert(nome);
       return { id: result.insertId, nome };
     } catch (error) {
-      console.error('Erro ao criar tipo de usuário:', error);
+      console.error('Erro na Model ao criar tipo de usuário:', error);
       throw error;
     }
   },
 
   findAll: async () => {
     try {
-      const sql = 'SELECT * FROM TIPOS_USUARIO';
-      const [rows] = await pool.query(sql);
-      return rows;
+      return await TipoUsuarioDAO.selectAll();
     } catch (error) {
-      console.error('Erro ao buscar tipos de usuário:', error);
+      console.error('Erro na Model ao buscar tipos de usuário:', error);
       throw error;
     }
   },
 
   findById: async (id) => {
     try {
-      const sql = 'SELECT * FROM TIPOS_USUARIO WHERE id = ?';
-      const [rows] = await pool.query(sql, [id]);
-      return rows[0];
+      return await TipoUsuarioDAO.selectById(id);
     } catch (error) {
-      console.error('Erro ao buscar tipo de usuário por ID:', error);
+      console.error('Erro na Model ao buscar tipo de usuário por ID:', error);
       throw error;
     }
   },
 
   update: async (id, { nome }) => {
     try {
-      const sql = 'UPDATE TIPOS_USUARIO SET nome = ? WHERE id = ?';
-      const [result] = await pool.query(sql, [nome, id]);
+      const result = await TipoUsuarioDAO.update(id, nome);
       return result.affectedRows;
     } catch (error) {
-      console.error('Erro ao atualizar tipo de usuário:', error);
+      console.error('Erro na Model ao atualizar tipo de usuário:', error);
       throw error;
     }
   },
 
   remove: async (id) => {
     try {
-      const sql = 'DELETE FROM TIPOS_USUARIO WHERE id = ?';
-      const [result] = await pool.query(sql, [id]);
+      const result = await TipoUsuarioDAO.delete(id);
       return result.affectedRows;
     } catch (error) {
-      console.error('Erro ao deletar tipo de usuário:', error);
+      console.error('Erro na Model ao deletar tipo de usuário:', error);
       
+      // REGRA DE NEGÓCIO: Tratamento de erro específico continua aqui
       if (error.code === 'ER_ROW_IS_REFERENCED_2') {
         throw new Error('Não é possível excluir. Este perfil está sendo usado por usuários.');
       }

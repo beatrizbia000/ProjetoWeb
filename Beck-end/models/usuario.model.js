@@ -1,53 +1,63 @@
-const pool = require('../config/db');
+// Beck-end/models/usuario.model.js
+const UsuarioDAO = require('../dao/usuario.dao'); // Importa o DAO que criamos
 const bcrypt = require('bcryptjs');
 
 const UsuarioModel = {
   
-  create: async ({ nome, email, senha, cnpj, cpf, tipo_usuario_id }) => {
-    try {
-      
-      const senhaHash = await bcrypt.hash(senha, 10);
-      
-      const sql = `INSERT INTO USUARIOS (nome, email, senha, cnpj, cpf, tipo_usuario_id) 
-                   VALUES (?, ?, ?, ?, ?, ?)`;
-                   
-      const [result] = await pool.query(sql, [nome, email, senhaHash, cnpj, cpf, tipo_usuario_id]);
-      
-      
-      return { id: result.insertId, nome, email, tipo_usuario_id };
-    } catch (error) {
-      console.error('Erro ao criar usuário:', error);
-      throw error;
-    }
-  },
+    create: async ({ nome, email, senha, cnpj, cpf, tipo_usuario_id }) => {
+        try {
+            // 1. REGRA DE NEGÓCIO: Criptografar a senha aqui na Model
+            const senhaHash = await bcrypt.hash(senha, 10);
+            
+            // 2. Prepara o objeto para o DAO
+            const novoUsuario = {
+                nome,
+                email,
+                senha: senhaHash, // Manda a senha já criptografada
+                cnpj,
+                cpf,
+                tipo_usuario_id
+            };
 
-  
-  findByEmail: async (email) => {
-    try {
-      const sql = `SELECT * FROM USUARIOS WHERE email = ?`;
-      const [rows] = await pool.query(sql, [email]);
-      return rows[0]; 
-    } catch (error) {
-      console.error('Erro ao buscar por email:', error);
-      throw error;
-    }
-  },
+            // 3. CHAMADA AO DAO: Apenas persiste os dados
+            const result = await UsuarioDAO.insert(novoUsuario);
+            
+            // 4. Retorna o objeto formatado para o Controller
+            return { id: result.insertId, nome, email, tipo_usuario_id };
 
-  
-  findById: async (id) => {
-    try {
-      
-      const sql = `SELECT id, nome, email, cnpj, cpf, tipo_usuario_id, status_bloqueio 
-                   FROM USUARIOS WHERE id = ?`;
-      const [rows] = await pool.query(sql, [id]);
-      return rows[0];
-    } catch (error) {
-      console.error('Erro ao buscar por ID:', error);
-      throw error;
+        } catch (error) {
+            console.error('Erro na Model ao criar usuário:', error);
+            throw error;
+        }
+    },
+
+    findByEmail: async (email) => {
+        try {
+            // Chama o DAO diretamente
+            return await UsuarioDAO.selectByEmail(email);
+        } catch (error) {
+            console.error('Erro na Model ao buscar por email:', error);
+            throw error;
+        }
+    },
+
+    findById: async (id) => {
+        try {
+            return await UsuarioDAO.selectById(id);
+        } catch (error) {
+            console.error('Erro na Model ao buscar por ID:', error);
+            throw error;
+        }
+    },
+
+    findAll: async () => {
+        try {
+            return await UsuarioDAO.selectAll();
+        } catch (error) {
+            console.error('Erro na Model ao listar todos:', error);
+            throw error;
+        }
     }
-  }
-  
-  
 };
 
 module.exports = UsuarioModel;
