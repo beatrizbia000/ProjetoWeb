@@ -1,86 +1,64 @@
-import React from "react";
-import Header from "../components/Header"; //
-import { FaCalendarCheck, FaUserCircle } from "react-icons/fa";
-import { BiTime } from "react-icons/bi";
+import React, { useEffect, useState } from "react";
+import { useNavigate } from "react-router-dom";
+import Header from "../components/Header";
+import { FaCalendarPlus, FaListAlt, FaUserCog, FaSignOutAlt } from "react-icons/fa";
 
 export default function Home() {
+  const navigate = useNavigate();
+  const [usuario, setUsuario] = useState(null);
+
+  useEffect(() => {
+    const usuarioSalvo = localStorage.getItem("usuario");
+    if (!usuarioSalvo) {
+      navigate("/");
+    } else {
+      setUsuario(JSON.parse(usuarioSalvo));
+    }
+  }, [navigate]);
+
+  if (!usuario) return null;
+
   return (
-    // Container principal que ocupa a tela toda
-    <div className="flex min-h-screen flex-col bg-bg-light">
-      
-      {/* 1. Header (O seu componente que já existe) */}
-      <Header /> {/* */}
-
-      {/* 2. Conteúdo Principal */}
-      <main className="flex-grow px-4 py-12 text-center md:px-8 md:py-16">
+    <div className="flex min-h-screen flex-col bg-[#f8f9fa] font-sans">
+      <Header />
+      <main className="flex-grow px-6 py-10 md:px-12 max-w-7xl mx-auto w-full">
         
-        {/* Seção Hero */}
-        <section className="mb-12 md:mb-16">
-          <h1 className="mb-4 text-4xl font-semibold text-gray-800 md:text-5xl">
-            Seja bem vindo
+        <section className="mb-12">
+          <h1 className="text-3xl font-bold text-gray-800">
+            Olá, <span className="text-[#004A8D]">{usuario.nome}</span>
           </h1>
-          <p className="mx-auto max-w-2xl text-lg text-header md:text-xl">
-            Agende seu atendimento fiscal de forma rápida, fácil e gratuita.
-            Profissionais capacitados prontos para auxiliar você!
-          </p>
+          <p className="text-gray-500 mt-1">Bem-vindo ao seu painel NAF.</p>
         </section>
 
-        {/* Intro dos Benefícios */}
-        <section className="mb-12 md:mb-16">
-          <p className="text-lg text-gray-600">
-            Oferecemos suporte gratuito e especializado para suas
-            necessidades fiscais
-          </p>
-        </section>
-
-        {/* Cards de Benefícios */}
-        <section className="mx-auto grid max-w-6xl gap-8 md:grid-cols-3">
-          
-          {/* Card 1 */}
-          <div className="flex flex-col items-center rounded-xl border border-gray-200 bg-white p-8 shadow-lg transition-all duration-200 hover:-translate-y-1 hover:shadow-xl">
-            <FaCalendarCheck className="mb-6 text-5xl text-header" />
-            <h3 className="mb-3 text-2xl font-semibold text-gray-800">
-              Agendamento online
-            </h3>
-            <p className="text-gray-600">
-              Agende seus atendimentos de forma rápida e prática, 24 horas
-              por dia.
-            </p>
+        <section className="grid grid-cols-1 md:grid-cols-3 gap-8">
+          {/* Botão Novo Agendamento */}
+          <div onClick={() => navigate("/novo-agendamento")} className="group bg-white p-8 rounded-2xl shadow-sm hover:shadow-xl border border-gray-100 cursor-pointer transition-all">
+            <div className="mb-5 w-16 h-16 bg-blue-50 rounded-xl flex items-center justify-center text-blue-600">
+              <FaCalendarPlus size={32} />
+            </div>
+            <h3 className="text-xl font-bold text-gray-800">Novo Agendamento</h3>
+            <p className="text-gray-500 text-sm">Agende um novo serviço ou mentoria.</p>
           </div>
 
-          {/* Card 2 */}
-          <div className="flex flex-col items-center rounded-xl border border-gray-200 bg-white p-8 shadow-lg transition-all duration-200 hover:-translate-y-1 hover:shadow-xl">
-            <BiTime className="mb-6 text-5xl text-header" />
-            <h3 className="mb-3 text-2xl font-semibold text-gray-800">
-              Economia de Tempo
-            </h3>
-            <p className="text-gray-600">
-              Agende seus atendimentos de forma rápida e prática, 24 horas
-              por dia.
-            </p>
+          {/* Botão Meus Agendamentos */}
+          <div className="group bg-white p-8 rounded-2xl shadow-sm hover:shadow-xl border border-gray-100 cursor-pointer transition-all opacity-60">
+            <div className="mb-5 w-16 h-16 bg-indigo-50 rounded-xl flex items-center justify-center text-indigo-600">
+              <FaListAlt size={32} />
+            </div>
+            <h3 className="text-xl font-bold text-gray-800">Histórico</h3>
+            <p className="text-gray-500 text-sm">Veja seus agendamentos (Em breve).</p>
           </div>
 
-          {/* Card 3 */}
-          <div className="flex flex-col items-center rounded-xl border border-gray-200 bg-white p-8 shadow-lg transition-all duration-200 hover:-translate-y-1 hover:shadow-xl">
-            <FaUserCircle className="mb-6 text-5xl text-header" />
-            <h3 className="mb-3 text-2xl font-semibold text-gray-800">
-              Atendimento Especializado
-            </h3>
-            <p className="text-gray-600">
-              Agende seus atendimentos de forma rápida e prática, 24 horas
-              por dia.
-            </p>
+          {/* Botão Perfil */}
+          <div onClick={() => navigate("/perfil")} className="group bg-white p-8 rounded-2xl shadow-sm hover:shadow-xl border border-gray-100 cursor-pointer transition-all">
+            <div className="mb-5 w-16 h-16 bg-gray-50 rounded-xl flex items-center justify-center text-gray-600">
+              <FaUserCog size={32} />
+            </div>
+            <h3 className="text-xl font-bold text-gray-800">Minha Conta</h3>
+            <p className="text-gray-500 text-sm">Gerencie seus dados pessoais.</p>
           </div>
-
         </section>
       </main>
-
-      {/* 3. Rodapé */}
-      <footer className="w-full bg-footer p-6 text-center text-white mt-12">
-        <p className="text-sm">
-          © 2025 NAF - Todos os direitos reservados
-        </p>
-      </footer>
     </div>
   );
 }

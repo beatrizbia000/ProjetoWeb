@@ -1,0 +1,318 @@
+import React, { useState, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
+import axios from "axios";
+import Header from "../components/Header";
+import { 
+  FaStore,          // Ícone para MEI
+  FaUserGraduate,   // Ícone para Aluno
+  FaChalkboardTeacher, // Ícone para Professor
+  FaUserShield,     // Ícone para Admin
+  FaInfoCircle 
+} from "react-icons/fa";
+
+function NovoAgendamento() {
+  const navigate = useNavigate();
+  const API_URL = "http://localhost:3001/api";
+
+  // --- Definição dos IDs de Perfil (Baseado no Banco de Dados) ---
+  const PERFIL_ADMIN = 1;
+  const PERFIL_PROFESSOR = 2;
+  const PERFIL_ALUNO = 3;
+  const PERFIL_MEI = 4;
+
+  // --- Estados ---
+  const [usuario, setUsuario] = useState(null);
+  const [servicos, setServicos] = useState([]);
+  const [horarios, setHorarios] = useState([]);
+  const [loading, setLoading] = useState(true);
+  
+  // Formulario
+  const [selectedServico, setSelectedServico] = useState("");
+  const [selectedHorario, setSelectedHorario] = useState("");
+  const [clienteExterno, setClienteExterno] = useState(""); // Campo exclusivo para Prof/Admin
+  const [observacao, setObservacao] = useState(""); // Campo para Aluno/Prof
+  
+  const [mensagem, setMensagem] = useState({ tipo: "", texto: "" });
+
+  // --- Carregamento Inicial ---
+  useEffect(() => {
+    const carregarDados = async () => {
+      const token = localStorage.getItem("token");
+      const usuarioSalvo = localStorage.getItem("usuario");
+
+      if (!token || !usuarioSalvo) {
+        navigate("/");
+        return;
+      }
+
+      const userObj = JSON.parse(usuarioSalvo);
+      setUsuario(userObj);
+
+      try {
+        // Busca serviços e horários em paralelo
+        const [resServicos, resHorarios] = await Promise.all([
+          axios.get(`${API_URL}/tipos-servico`),
+          axios.get(`${API_URL}/agendamentos/horarios-disponiveis`)
+        ]);
+        
+        setServicos(resServicos.data);
+        setHorarios(resHorarios.data);
+      } catch (error) {
+        console.error("Erro ao carregar dados", error);
+        setMensagem({ tipo: "erro", texto: "Erro de conexão com o servidor." });
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    carregarDados();
+  }, [navigate]);
+
+  // --- Lógica de Envio ---
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    const token = localStorage.getItem("token");
+
+    if (!selectedServico || !selectedHorario) {
+        setMensagem({ tipo: "erro", texto: "Por favor, selecione um serviço e um horário." });
+        return;
+    }
+
+    // Validação de Regra de Negócio: Professor/Admin deve informar cliente se for atendimento externo
+    if ((usuario.tipo === PERFIL_PROFESSOR || usuario.tipo === PERFIL_ADMIN) && !clienteExterno) {
+        // Opcional: poderia bloquear ou apenas avisar. Aqui vamos deixar passar mas assumindo que é para o próprio prof se estiver vazio.
+    }
+
+    try {
+      const payload = {
+        horario_id: selectedHorario,
+        tipo_servico_id: selectedServico,
+        // Campos extras que o backend pode processar ou logar
+        cliente_nome: clienteExterno || usuario.nome, 
+        observacao: observacao
+      };
+
+      await axios.post(`${API_URL}/agendamentos`, payload, {
+        headers: { Authorization: `Bearer ${token}` }
+      });
+
+      setMensagem({ tipo: "sucesso", texto: "Agendamento confirmado com sucesso!" });
+      setTimeout(() => navigate("/home"), 2000);
+
+    } catch (error) {
+      console.error(error);
+      setMensagem({ tipo: "erro", texto: "Não foi possível realizar o agendamento." });
+    }
+  };
+
+  // --- Renderização Condicional por Perfil (CENÁRIOS) ---
+  const getPerfilConfig = () => {
+    if (!usuario) return {};
+
+    switch (usuario.tipo) {
+      case PERFIL_MEI:
+        return {
+          titulo: "Área do Empreendedor",
+          descricao: "Agende seu atendimento gratuito para regularização ou consultoria.",
+          cor: "bg-blue-600",
+          corTexto: "text-blue-600",
+          icone: <FaStore className="text-4xl text-blue-600" />,
+          labelServico: "Qual serviço você necessita?",
+          permiteClienteExterno: false
+        };
+      case PERFIL_ALUNO:
+        return {
+          titulo: "Área do Aluno",
+          descricao: "Agende mentorias com professores ou reserve horários para prática.",
+          cor: "bg-green-600",
+          corTexto: "text-green-600",
+          icone: <FaUserGraduate className="text-4xl text-green-600" />,
+          labelServico: "Tipo de Mentoria / Atividade:",
+          permiteClienteExterno: false,
+          permiteObservacao: true
+        };
+      case PERFIL_PROFESSOR:
+        return {
+          titulo: "Portal do Professor",
+          descricao: "Gerencie atendimentos e realize agendamentos para cidadãos no balcão.",
+          cor: "bg-purple-600",
+          corTexto: "text-purple-600",
+          icone: <FaChalkboardTeacher className="text-4xl text-purple-600" />,
+          labelServico: "Serviço a ser prestado:",
+          permiteClienteExterno: true,
+          permiteObservacao: true
+        };
+      case PERFIL_ADMIN:
+        return {
+          titulo: "Administração NAF",
+          descricao: "Controle total de agenda. Agendamento prioritário.",
+          cor: "bg-red-600",
+          corTexto: "text-red-600",
+          icone: <FaUserShield className="text-4xl text-red-600" />,
+          labelServico: "Serviço:",
+          permiteClienteExterno: true,
+          permiteObservacao: true
+        };
+      default:
+        return {
+          titulo: "Novo Agendamento",
+          cor: "bg-gray-600",
+          labelServico: "Serviço:"
+        };
+    }
+  };
+
+  const config = getPerfilConfig();
+
+  if (loading) return <div className="flex justify-center items-center h-screen">Carregando...</div>;
+
+  return (
+    <div className="min-h-screen flex flex-col bg-gray-50 font-sans">
+      <Header />
+
+      <main className="flex-grow flex flex-col items-center pt-8 px-4 pb-12">
+        
+        {/* Cabeçalho Dinâmico do Card */}
+        <div className="w-full max-w-3xl bg-white rounded-t-2xl shadow-sm border-b border-gray-100 p-6 flex items-center gap-4">
+          <div className="p-3 bg-gray-50 rounded-full">
+            {config.icone}
+          </div>
+          <div>
+            <h1 className={`text-2xl font-bold ${config.corTexto}`}>{config.titulo}</h1>
+            <p className="text-gray-500 text-sm">{config.descricao}</p>
+          </div>
+        </div>
+
+        <div className="bg-white w-full max-w-3xl rounded-b-2xl shadow-lg p-8">
+            
+            {/* Mensagens de Feedback */}
+            {mensagem.texto && (
+                <div className={`mb-6 p-4 rounded-lg flex items-center gap-2 text-sm font-medium ${mensagem.tipo === 'sucesso' ? 'bg-green-50 text-green-700 border border-green-200' : 'bg-red-50 text-red-700 border border-red-200'}`}>
+                    <FaInfoCircle />
+                    {mensagem.texto}
+                </div>
+            )}
+
+            <form onSubmit={handleSubmit} className="space-y-8">
+                
+                {/* CENÁRIO PROFESSOR/ADMIN: Agendar para Terceiros */}
+                {config.permiteClienteExterno && (
+                    <div className="bg-yellow-50 border border-yellow-100 p-5 rounded-xl">
+                        <h3 className="text-yellow-800 font-bold text-sm mb-3 uppercase tracking-wide">Atendimento Presencial / Balcão</h3>
+                        <div className="flex flex-col">
+                            <label className="text-sm font-medium text-gray-700 mb-1">Nome do Cidadão (Cliente)</label>
+                            <input 
+                                type="text" 
+                                className="w-full p-2.5 bg-white border border-gray-300 rounded-lg focus:ring-2 focus:ring-yellow-400 focus:border-yellow-400 outline-none transition"
+                                placeholder="Digite o nome completo do cliente..."
+                                value={clienteExterno}
+                                onChange={(e) => setClienteExterno(e.target.value)}
+                            />
+                            <p className="text-xs text-gray-500 mt-1">
+                                * Deixe em branco se o agendamento for para você mesmo.
+                            </p>
+                        </div>
+                    </div>
+                )}
+
+                {/* Seleção de Serviço */}
+                <div>
+                    <label className="block text-sm font-bold text-gray-700 mb-2">
+                        {config.labelServico}
+                    </label>
+                    <select 
+                        className="w-full p-3 bg-white border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:outline-none transition shadow-sm"
+                        value={selectedServico}
+                        onChange={(e) => setSelectedServico(e.target.value)}
+                    >
+                        <option value="">Selecione uma opção...</option>
+                        {servicos.map(servico => (
+                            <option key={servico.id} value={servico.id}>
+                                {servico.nome_servico}
+                            </option>
+                        ))}
+                    </select>
+                </div>
+
+                {/* Campo de Observação (Aluno/Prof/Admin) */}
+                {config.permiteObservacao && (
+                    <div>
+                        <label className="block text-sm font-bold text-gray-700 mb-2">Observações / Dúvidas:</label>
+                        <textarea
+                            rows="2"
+                            className="w-full p-3 bg-white border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:outline-none transition shadow-sm"
+                            placeholder="Detalhes adicionais sobre a solicitação..."
+                            value={observacao}
+                            onChange={(e) => setObservacao(e.target.value)}
+                        ></textarea>
+                    </div>
+                )}
+
+                {/* Grid de Horários */}
+                <div>
+                    <label className="block text-sm font-bold text-gray-700 mb-3 flex justify-between items-center">
+                        <span>Horários Disponíveis</span>
+                        <span className="text-xs font-normal text-gray-500 bg-gray-100 px-2 py-1 rounded-full">{horarios.length} horários encontrados</span>
+                    </label>
+                    
+                    {horarios.length === 0 ? (
+                        <div className="py-8 text-center border-2 border-dashed border-gray-200 rounded-xl bg-gray-50">
+                            <p className="text-gray-500">Nenhum horário disponível na agenda pública no momento.</p>
+                        </div>
+                    ) : (
+                        <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-3">
+                            {horarios.map(horario => {
+                                const data = new Date(horario.data_horario);
+                                const dia = data.toLocaleDateString('pt-BR', { day: '2-digit', month: '2-digit' });
+                                const hora = data.toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' });
+                                const isSelected = String(selectedHorario) === String(horario.id);
+
+                                return (
+                                    <div 
+                                        key={horario.id}
+                                        onClick={() => setSelectedHorario(horario.id)}
+                                        className={`
+                                            cursor-pointer relative p-3 rounded-xl text-center border transition-all duration-200 group
+                                            ${isSelected 
+                                                ? `${config.cor} text-white border-transparent shadow-md scale-105 ring-2 ring-offset-1 ring-blue-300` 
+                                                : 'bg-white text-gray-700 border-gray-200 hover:border-blue-400 hover:shadow-md'}
+                                        `}
+                                    >
+                                        <p className={`text-xs font-medium uppercase mb-1 ${isSelected ? 'text-blue-100' : 'text-gray-400'}`}>Dia</p>
+                                        <p className="text-lg font-bold leading-none mb-1">{dia}</p>
+                                        <div className={`h-px w-8 mx-auto my-2 ${isSelected ? 'bg-white/30' : 'bg-gray-200'}`}></div>
+                                        <p className="text-sm font-semibold">{hora}</p>
+                                    </div>
+                                );
+                            })}
+                        </div>
+                    )}
+                </div>
+
+                {/* Botão de Confirmação */}
+                <div className="pt-4">
+                    <button 
+                        type="submit"
+                        disabled={horarios.length === 0}
+                        className={`
+                            w-full py-4 rounded-xl font-bold text-white text-lg transition-all shadow-lg hover:shadow-xl active:scale-[0.99]
+                            ${horarios.length === 0 
+                                ? 'bg-gray-300 cursor-not-allowed opacity-70' 
+                                : `${config.cor} hover:opacity-90`}
+                        `}
+                    >
+                        Confirmar Agendamento
+                    </button>
+                </div>
+            </form>
+        </div>
+      </main>
+      
+      <footer className="w-full bg-[#004A8D] p-4 text-center text-white mt-auto">
+        <p className="text-xs opacity-80">© 2025 NAF - Núcleo de Apoio Contábil e Fiscal</p>
+      </footer>
+    </div>
+  );
+}
+
+export default NovoAgendamento;

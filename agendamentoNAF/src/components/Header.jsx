@@ -7,8 +7,12 @@ export default function Header() {
   return (
     <header className="w-full bg-[#004A8D] pb-0">
       <div className="flex items-center justify-between px-6 h-20">
-        {/* LOGO */}
-        <h1 className="text-white text-2xl font-semibold">Agendamentos NAF</h1>
+        
+       <Link to="/home" className="hover:opacity-80 transition-opacity">
+            <h1 className="text-white text-2xl font-semibold cursor-pointer">
+                Agendamentos NAF
+            </h1>
+        </Link>
 
         {/* BOTÃO MOBILE */}
         <button
@@ -16,7 +20,7 @@ export default function Header() {
           onClick={() => setIsOpen(!isOpen)}
         >
           {isOpen ? (
-            // Ícone X
+            
             <svg
               xmlns="http://www.w3.org/2000/svg"
               fill="none"
@@ -32,7 +36,7 @@ export default function Header() {
               />
             </svg>
           ) : (
-            // Ícone hambúrguer
+            
             <svg
               xmlns="http://www.w3.org/2000/svg"
               fill="none"
@@ -52,7 +56,7 @@ export default function Header() {
 
         {/* LINKS (DESKTOP) */}
         <nav className="hidden md:flex items-center gap-10">
-          <Link to="/home" className="text-white font-semibold ">
+          <Link to="/novo-agendamento" className="text-white font-semibold ">
             Novo Agendamento
           </Link>
           <Link to="/home" className="text-white font-semibold ">
