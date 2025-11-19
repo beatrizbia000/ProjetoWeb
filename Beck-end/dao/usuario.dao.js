@@ -1,4 +1,4 @@
-// Beck-end/dao/usuario.dao.js
+
 const pool = require('../config/db');
 
 const UsuarioDAO = {
@@ -27,10 +27,16 @@ const UsuarioDAO = {
     },
 
     selectAll: async () => {
-        // Caso você queira mover o listarTodos também
+       
         const sql = `SELECT id, nome, email, tipo_usuario_id FROM USUARIOS`; 
         const [rows] = await pool.query(sql);
         return rows;
+    },
+
+    update: async (id, dados) => {
+        const sql = `UPDATE USUARIOS SET nome = ?, email = ?, cpf = ?, cnpj = ? WHERE id = ?`;
+        const [result] = await pool.query(sql, [dados.nome, dados.email, dados.cpf, dados.cnpj, id]);
+        return result;
     }
 };
 

@@ -63,6 +63,38 @@ const usuarioController = {
             console.error('Erro ao buscar usuário por email:', error);
             res.status(500).json({ message: 'Erro interno do servidor' });
         }
+    },
+
+   // Adicione essas funções ao usuarioController:
+
+    buscarPorId: async (req, res) => {
+        try {
+            const { id } = req.params;
+            const usuario = await UsuarioModel.findById(id);
+            if (!usuario) return res.status(404).json({ message: 'Usuário não encontrado' });
+            
+            
+            const { senha, ...dados } = usuario;
+            res.status(200).json(dados);
+        } catch (error) {
+            res.status(500).json({ message: 'Erro interno' });
+        }
+    },
+
+    atualizarUsuario: async (req, res) => {
+        try {
+            const { id } = req.params;
+            const { nome, email, cpf, cnpj } = req.body;
+            const linhasAfetadas = await UsuarioModel.update(id, { nome, email, cpf, cnpj });
+
+            if (linhasAfetadas > 0) {
+                res.status(200).json({ message: 'Dados atualizados com sucesso!' });
+            } else {
+                res.status(404).json({ message: 'Usuário não encontrado ou sem alterações.' });
+            }
+        } catch (error) {
+            res.status(500).json({ message: 'Erro ao atualizar.' });
+        }
     }
 };
 

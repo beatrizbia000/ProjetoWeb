@@ -46,8 +46,7 @@ const TipoServicoModel = {
         const result = await TipoServicoDAO.delete(id);
         return result.affectedRows;
     } catch (error) {
-        // Lógica de negócio: você pode adicionar aqui o tratamento para 'ER_ROW_IS_REFERENCED_2'
-        // igual fez no TipoUsuario, caso um serviço já esteja agendado.
+       
         console.error('Erro na Model ao remover serviço:', error);
         throw error;
     }
