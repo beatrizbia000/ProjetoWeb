@@ -16,8 +16,6 @@ const AgendamentoController = {
             const { horario_id, tipo_servico_id } = req.body;
             const usuario_id = req.usuario.id; 
 
-            
-            
             if (!horario_id || !tipo_servico_id) {
                 return res.status(400).json({ message: 'Horário e Serviço são obrigatórios.' });
             }
@@ -44,7 +42,6 @@ const AgendamentoController = {
 
     atribuirAluno: async (req, res) => {
         try {
-            
             if (req.usuario.tipo > 2) {
                 return res.status(403).json({ message: 'Apenas professores podem atribuir alunos.' });
             }
@@ -61,25 +58,43 @@ const AgendamentoController = {
 
     criarHorario: async (req, res) => {
         try {
-            if (req.usuario.tipo > 2) {
-                return res.status(403).json({ message: 'Acesso negado.' });
-            }
+           if (req.usuario.tipo !== 2 && req.usuario.tipo !== 3) { 
+        return res.status(403).json({ message: 'Acesso negado.' });
+    }
             const { data_horario } = req.body;
             await AgendamentoDAO.criarHorario(data_horario, req.usuario.id);
             res.status(201).json({ message: 'Horário criado com sucesso.' });
         } catch (error) {
+            console.error(error);
             res.status(500).json({ message: 'Erro ao criar horário.' });
         }
     },
-    
+
+    atualizarStatus: async (req, res) => {
+        try {
+            
+            if (req.usuario.tipo !== 2 && req.usuario.tipo !== 3) {
+                return res.status(403).json({ message: 'Acesso negado.' });
+            }
+
+            const { id } = req.params;
+            const { status } = req.body; 
+
+            await AgendamentoDAO.atualizarStatus(id, status);
+            res.status(200).json({ message: 'Status atualizado com sucesso!' });
+        } catch (error) {
+            console.error(error);
+            res.status(500).json({ message: 'Erro ao atualizar status.' });
+        }
+    },
     
     listarAlunos: async (req, res) => {
         try {
             
-            const pool = require('../config/db'); 
-            const [alunos] = await pool.query("SELECT id, nome FROM USUARIOS WHERE tipo_usuario_id = 3");
+            const alunos = await AgendamentoDAO.listarAlunos();
             res.status(200).json(alunos);
         } catch(error) {
+            console.error(error);
             res.status(500).json({ message: 'Erro ao listar alunos' });
         }
     }
