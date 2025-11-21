@@ -14,27 +14,24 @@ function NovoAgendamento() {
   const navigate = useNavigate();
   const API_URL = "http://localhost:3001/api";
 
-  // --- Definição dos IDs de Perfil (Baseado no Banco de Dados) ---
-  const PERFIL_ADMIN = 1;
+ const PERFIL_ALUNO = 1;
   const PERFIL_PROFESSOR = 2;
-  const PERFIL_ALUNO = 3;
+  const PERFIL_ADMIN = 3;
   const PERFIL_MEI = 4;
-
-  // --- Estados ---
+  
   const [usuario, setUsuario] = useState(null);
   const [servicos, setServicos] = useState([]);
   const [horarios, setHorarios] = useState([]);
   const [loading, setLoading] = useState(true);
   
-  // Formulario
   const [selectedServico, setSelectedServico] = useState("");
   const [selectedHorario, setSelectedHorario] = useState("");
-  const [clienteExterno, setClienteExterno] = useState(""); // Campo exclusivo para Prof/Admin
-  const [observacao, setObservacao] = useState(""); // Campo para Aluno/Prof
+  const [clienteExterno, setClienteExterno] = useState(""); 
+  const [observacao, setObservacao] = useState(""); 
   
   const [mensagem, setMensagem] = useState({ tipo: "", texto: "" });
 
-  // --- Carregamento Inicial ---
+  
   useEffect(() => {
     const carregarDados = async () => {
       const token = localStorage.getItem("token");
@@ -49,7 +46,7 @@ function NovoAgendamento() {
       setUsuario(userObj);
 
       try {
-        // Busca serviços e horários em paralelo
+       
         const [resServicos, resHorarios] = await Promise.all([
           axios.get(`${API_URL}/tipos-servico`),
           axios.get(`${API_URL}/agendamentos/horarios-disponiveis`)
@@ -68,7 +65,7 @@ function NovoAgendamento() {
     carregarDados();
   }, [navigate]);
 
-  // --- Lógica de Envio ---
+
   const handleSubmit = async (e) => {
     e.preventDefault();
     const token = localStorage.getItem("token");
@@ -78,16 +75,16 @@ function NovoAgendamento() {
         return;
     }
 
-    // Validação de Regra de Negócio: Professor/Admin deve informar cliente se for atendimento externo
+    
     if ((usuario.tipo === PERFIL_PROFESSOR || usuario.tipo === PERFIL_ADMIN) && !clienteExterno) {
-        // Opcional: poderia bloquear ou apenas avisar. Aqui vamos deixar passar mas assumindo que é para o próprio prof se estiver vazio.
+      //
     }
 
     try {
       const payload = {
         horario_id: selectedHorario,
         tipo_servico_id: selectedServico,
-        // Campos extras que o backend pode processar ou logar
+        
         cliente_nome: clienteExterno || usuario.nome, 
         observacao: observacao
       };
@@ -105,7 +102,7 @@ function NovoAgendamento() {
     }
   };
 
-  // --- Renderização Condicional por Perfil (CENÁRIOS) ---
+ 
   const getPerfilConfig = () => {
     if (!usuario) return {};
 
@@ -172,7 +169,7 @@ function NovoAgendamento() {
 
       <main className="flex-grow flex flex-col items-center pt-8 px-4 pb-12">
         
-        {/* Cabeçalho Dinâmico do Card */}
+        
         <div className="w-full max-w-3xl bg-white rounded-t-2xl shadow-sm border-b border-gray-100 p-6 flex items-center gap-4">
           <div className="p-3 bg-gray-50 rounded-full">
             {config.icone}
@@ -185,7 +182,7 @@ function NovoAgendamento() {
 
         <div className="bg-white w-full max-w-3xl rounded-b-2xl shadow-lg p-8">
             
-            {/* Mensagens de Feedback */}
+        
             {mensagem.texto && (
                 <div className={`mb-6 p-4 rounded-lg flex items-center gap-2 text-sm font-medium ${mensagem.tipo === 'sucesso' ? 'bg-green-50 text-green-700 border border-green-200' : 'bg-red-50 text-red-700 border border-red-200'}`}>
                     <FaInfoCircle />
@@ -195,7 +192,7 @@ function NovoAgendamento() {
 
             <form onSubmit={handleSubmit} className="space-y-8">
                 
-                {/* CENÁRIO PROFESSOR/ADMIN: Agendar para Terceiros */}
+              
                 {config.permiteClienteExterno && (
                     <div className="bg-yellow-50 border border-yellow-100 p-5 rounded-xl">
                         <h3 className="text-yellow-800 font-bold text-sm mb-3 uppercase tracking-wide">Atendimento Presencial / Balcão</h3>
@@ -215,7 +212,7 @@ function NovoAgendamento() {
                     </div>
                 )}
 
-                {/* Seleção de Serviço */}
+             
                 <div>
                     <label className="block text-sm font-bold text-gray-700 mb-2">
                         {config.labelServico}
@@ -234,7 +231,7 @@ function NovoAgendamento() {
                     </select>
                 </div>
 
-                {/* Campo de Observação (Aluno/Prof/Admin) */}
+                
                 {config.permiteObservacao && (
                     <div>
                         <label className="block text-sm font-bold text-gray-700 mb-2">Observações / Dúvidas:</label>
@@ -248,7 +245,7 @@ function NovoAgendamento() {
                     </div>
                 )}
 
-                {/* Grid de Horários */}
+               
                 <div>
                     <label className="block text-sm font-bold text-gray-700 mb-3 flex justify-between items-center">
                         <span>Horários Disponíveis</span>
@@ -289,7 +286,6 @@ function NovoAgendamento() {
                     )}
                 </div>
 
-                {/* Botão de Confirmação */}
                 <div className="pt-4">
                     <button 
                         type="submit"
