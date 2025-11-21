@@ -8,6 +8,7 @@ const ID_MEI = 4;
 
 const AgendamentoDAO = {
     
+    
     listarHorariosDisponiveis: async () => {
         const sql = `
             SELECT id, data_horario 
@@ -73,9 +74,9 @@ const AgendamentoDAO = {
 
         const params = [];
 
-        
+       
         if (tipoUsuarioId === ID_MEI) { 
-         
+            
             sql += ` WHERE a.usuario_id = ?`;
             params.push(usuarioId);
 
@@ -84,11 +85,8 @@ const AgendamentoDAO = {
             sql += ` WHERE a.aluno_voluntario_id = ?`;
             params.push(usuarioId);
 
-        } else if (tipoUsuarioId === ID_PROFESSOR || tipoUsuarioId === ID_ADMIN) { 
-            
-             sql += ` WHERE hd.criado_por_id = ?`;
-             params.push(usuarioId);
-        }
+        } 
+     
 
         sql += ` ORDER BY hd.data_horario DESC`;
 
@@ -102,6 +100,7 @@ const AgendamentoDAO = {
         return result.affectedRows;
     },
 
+    
     criarHorario: async (data_horario, criado_por_id) => {
         const sql = `INSERT INTO HORARIOS_DISPONIVEIS (data_horario, status, criado_por_id) VALUES (?, 'Disponível', ?)`;
         const [result] = await pool.query(sql, [data_horario, criado_por_id]);
@@ -109,7 +108,6 @@ const AgendamentoDAO = {
     },
 
     listarAlunos: async () => {
-        
         const sql = "SELECT id, nome FROM USUARIOS WHERE tipo_usuario_id = ?";
         const [rows] = await pool.query(sql, [ID_ALUNO]);
         return rows;
@@ -120,8 +118,6 @@ const AgendamentoDAO = {
         const [result] = await pool.query(sql, [status, id]);
         return result.affectedRows;
     }
-
-
 };
 
 module.exports = AgendamentoDAO;

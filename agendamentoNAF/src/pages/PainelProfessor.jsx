@@ -2,15 +2,7 @@ import React, { useState, useEffect } from "react";
 import axios from "axios";
 import Header from "../components/Header";
 import { 
-  FaUserGraduate, 
-  FaCheckCircle, 
-  FaExclamationCircle, 
-  FaClock, 
-  FaPlus, 
-  FaEdit, 
-  FaCheck, 
-  FaTimes,
-  FaSave
+  FaUserGraduate, FaCheckCircle, FaExclamationCircle, FaEdit, FaCheck, FaTimes, FaSave
 } from "react-icons/fa";
 
 export default function PainelProfessor() {
@@ -18,16 +10,11 @@ export default function PainelProfessor() {
   const [alunos, setAlunos] = useState([]);
   const [loading, setLoading] = useState(true);
   const [mensagem, setMensagem] = useState({ tipo: "", texto: "" });
-  
-  
   const [selecoesPendentes, setSelecoesPendentes] = useState({});
   
  
-  const [novoHorario, setNovoHorario] = useState("");
-
-  
-  const [editandoId, setEditandoId] = useState(null); 
-  const [alunoEditadoId, setAlunoEditadoId] = useState(""); 
+  const [editandoId, setEditandoId] = useState(null);
+  const [alunoEditadoId, setAlunoEditadoId] = useState("");
 
   const API_URL = "http://localhost:3001/api";
 
@@ -51,24 +38,6 @@ export default function PainelProfessor() {
     }
   };
 
- 
-  const handleCriarHorario = async (e) => {
-    e.preventDefault();
-    if (!novoHorario) return;
-    const token = localStorage.getItem("token");
-    try {
-        await axios.post(`${API_URL}/agendamentos/horario`, 
-            { data_horario: novoHorario },
-            { headers: { Authorization: `Bearer ${token}` } }
-        );
-        setMensagem({ tipo: "sucesso", texto: "Horário disponibilizado!" });
-        setNovoHorario("");
-    } catch (error) {
-        setMensagem({ tipo: "erro", texto: "Erro ao criar horário." });
-    }
-  };
-
-  
   const handleAtribuirPendente = async (agendamentoId) => {
     const alunoId = selecoesPendentes[agendamentoId];
     if (!alunoId) {
@@ -78,7 +47,6 @@ export default function PainelProfessor() {
     salvarAtribuicao(agendamentoId, alunoId);
   };
 
- 
   const salvarAtribuicao = async (agendamentoId, alunoId) => {
     const token = localStorage.getItem("token");
     try {
@@ -86,7 +54,7 @@ export default function PainelProfessor() {
         { alunoId: alunoId },
         { headers: { Authorization: `Bearer ${token}` } }
       );
-      setMensagem({ tipo: "sucesso", texto: "Aluno atribuído/atualizado com sucesso!" });
+      setMensagem({ tipo: "sucesso", texto: "Aluno atribuído com sucesso!" });
       setEditandoId(null);
       carregarDados();
     } catch (error) {
@@ -94,10 +62,8 @@ export default function PainelProfessor() {
     }
   };
 
-  
   const handleConcluir = async (agendamentoId) => {
     if (!window.confirm("Deseja marcar este atendimento como CONCLUÍDO?")) return;
-    
     const token = localStorage.getItem("token");
     try {
         await axios.put(`${API_URL}/agendamentos/${agendamentoId}/status`, 
@@ -111,21 +77,17 @@ export default function PainelProfessor() {
     }
   };
 
-  
   const iniciarEdicao = (item) => {
     setEditandoId(item.id);
-   
     const alunoAtual = alunos.find(a => a.nome === item.nome_aluno);
     setAlunoEditadoId(alunoAtual ? alunoAtual.id : "");
   };
 
-  
   const cancelarEdicao = () => {
     setEditandoId(null);
     setAlunoEditadoId("");
   };
 
-  
   const pendentes = agendamentos.filter(a => !a.nome_aluno && a.status === 'agendado');
   const emAndamento = agendamentos.filter(a => a.nome_aluno && a.status === 'agendado');
   const historico = agendamentos.filter(a => a.status === 'realizado' || a.status === 'cancelado');
@@ -143,32 +105,10 @@ export default function PainelProfessor() {
           </div>
         )}
 
-        
-        <section className="bg-white p-6 rounded-xl shadow-sm border border-blue-100 mb-8">
-            <h2 className="text-xl font-bold text-blue-800 mb-4 flex items-center gap-2">
-                <FaClock /> Disponibilizar Horário
-            </h2>
-            <form onSubmit={handleCriarHorario} className="flex gap-4 items-end">
-                <div className="flex-1">
-                    <label className="block text-sm font-medium text-gray-700 mb-1">Data e Hora</label>
-                    <input 
-                        type="datetime-local" 
-                        className="w-full p-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none"
-                        value={novoHorario}
-                        onChange={(e) => setNovoHorario(e.target.value)}
-                        required
-                    />
-                </div>
-                <button type="submit" className="bg-blue-600 text-white px-6 py-2.5 rounded-lg font-semibold hover:bg-blue-700 transition flex items-center gap-2">
-                    <FaPlus size={14}/> Adicionar
-                </button>
-            </form>
-        </section>
-
-       
+      
         <section className="mb-12">
           <h2 className="text-xl font-bold text-yellow-600 mb-4 flex items-center gap-2">
-            <FaExclamationCircle /> Solicitações Pendentes ({pendentes.length})
+            <FaExclamationCircle /> Solicitações de Agendamento (Geral)
           </h2>
           {pendentes.length === 0 ? (
             <p className="text-gray-400 italic bg-gray-50 p-4 rounded border border-dashed">Nenhuma solicitação pendente.</p>
@@ -191,7 +131,7 @@ export default function PainelProfessor() {
                       <option value="" disabled>Selecione aluno...</option>
                       {alunos.map(aluno => (<option key={aluno.id} value={aluno.id}>{aluno.nome}</option>))}
                     </select>
-                    <button onClick={() => handleAtribuirPendente(item.id)} className="bg-blue-600 text-white px-4 py-2 rounded-lg text-sm font-bold hover:bg-blue-700 transition">OK</button>
+                    <button onClick={() => handleAtribuirPendente(item.id)} className="bg-blue-600 text-white px-4 py-2 rounded-lg text-sm font-bold hover:bg-blue-700 transition">Assumir</button>
                   </div>
                 </div>
               ))}
@@ -199,10 +139,10 @@ export default function PainelProfessor() {
           )}
         </section>
 
-       
+        
         <section>
           <h2 className="text-xl font-bold text-green-700 mb-4 flex items-center gap-2">
-            <FaUserGraduate /> Atendimentos Agendados ({emAndamento.length})
+            <FaUserGraduate /> Atendimentos sob Orientação
           </h2>
           <div className="bg-white rounded-xl shadow overflow-hidden">
             <table className="w-full text-left">
@@ -217,19 +157,14 @@ export default function PainelProfessor() {
               <tbody className="text-sm divide-y divide-gray-100">
                 {emAndamento.map((item) => (
                   <tr key={item.id} className="hover:bg-gray-50">
-                  
                     <td className="p-4">
                       <div className="font-bold text-gray-700">{new Date(item.data_horario).toLocaleDateString('pt-BR')}</div>
                       <div className="text-gray-500">{new Date(item.data_horario).toLocaleTimeString('pt-BR', {hour: '2-digit', minute:'2-digit'})}</div>
                     </td>
-
-                   
                     <td className="p-4">
                       <div className="font-semibold">{item.nome_servico}</div>
                       <div className="text-gray-500 text-xs">{item.nome_cliente}</div>
                     </td>
-
-                   
                     <td className="p-4">
                         {editandoId === item.id ? (
                             <div className="flex flex-col gap-1">
@@ -250,41 +185,17 @@ export default function PainelProfessor() {
                             </span>
                         )}
                     </td>
-
-                    
                     <td className="p-4">
                         <div className="flex justify-center gap-2">
                             {editandoId === item.id ? (
                                 <>
-                                    <button 
-                                        onClick={() => salvarAtribuicao(item.id, alunoEditadoId)}
-                                        className="p-2 bg-green-600 text-white rounded hover:bg-green-700" title="Salvar Aluno"
-                                    >
-                                        <FaSave />
-                                    </button>
-                                    <button 
-                                        onClick={cancelarEdicao}
-                                        className="p-2 bg-gray-400 text-white rounded hover:bg-gray-500" title="Cancelar Edição"
-                                    >
-                                        <FaTimes />
-                                    </button>
+                                    <button onClick={() => salvarAtribuicao(item.id, alunoEditadoId)} className="p-2 bg-green-600 text-white rounded hover:bg-green-700"><FaSave /></button>
+                                    <button onClick={cancelarEdicao} className="p-2 bg-gray-400 text-white rounded hover:bg-gray-500"><FaTimes /></button>
                                 </>
                             ) : (
                                 <>
-                                    <button 
-                                        onClick={() => iniciarEdicao(item)}
-                                        className="p-2 bg-blue-100 text-blue-600 rounded hover:bg-blue-200 transition"
-                                        title="Editar Aluno (Corrigir)"
-                                    >
-                                        <FaEdit />
-                                    </button>
-                                    <button 
-                                        onClick={() => handleConcluir(item.id)}
-                                        className="px-3 py-2 bg-green-600 text-white rounded hover:bg-green-700 transition text-xs font-bold flex items-center gap-1"
-                                        title="Concluir Atendimento"
-                                    >
-                                        <FaCheck /> Concluir
-                                    </button>
+                                    <button onClick={() => iniciarEdicao(item)} className="p-2 bg-blue-100 text-blue-600 rounded hover:bg-blue-200 transition"><FaEdit /></button>
+                                    <button onClick={() => handleConcluir(item.id)} className="px-3 py-2 bg-green-600 text-white rounded hover:bg-green-700 transition text-xs font-bold flex items-center gap-1"><FaCheck /> Concluir</button>
                                 </>
                             )}
                         </div>
@@ -297,7 +208,6 @@ export default function PainelProfessor() {
           </div>
         </section>
 
-        
         {historico.length > 0 && (
             <section className="mt-12 opacity-75">
                 <h3 className="text-lg font-bold text-gray-500 mb-4">Histórico Recente</h3>
@@ -313,7 +223,6 @@ export default function PainelProfessor() {
                 </div>
             </section>
         )}
-
       </main>
     </div>
   );
