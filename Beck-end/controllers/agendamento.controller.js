@@ -29,6 +29,59 @@ const AgendamentoController = {
             console.error(error);
             res.status(500).json({ message: 'Erro ao realizar agendamento.' });
         }
+    },
+
+    listarMeusAgendamentos: async (req, res) => {
+        try {
+            const { id, tipo } = req.usuario; 
+            const agendamentos = await AgendamentoDAO.listarPorPerfil(id, tipo);
+            res.status(200).json(agendamentos);
+        } catch (error) {
+            console.error(error);
+            res.status(500).json({ message: 'Erro ao buscar agendamentos.' });
+        }
+    },
+
+    atribuirAluno: async (req, res) => {
+        try {
+            
+            if (req.usuario.tipo > 2) {
+                return res.status(403).json({ message: 'Apenas professores podem atribuir alunos.' });
+            }
+
+            const { agendamentoId } = req.params;
+            const { alunoId } = req.body;
+
+            await AgendamentoDAO.atribuirAluno(agendamentoId, alunoId);
+            res.status(200).json({ message: 'Aluno atribuído com sucesso!' });
+        } catch (error) {
+            res.status(500).json({ message: 'Erro ao atribuir aluno.' });
+        }
+    },
+
+    criarHorario: async (req, res) => {
+        try {
+            if (req.usuario.tipo > 2) {
+                return res.status(403).json({ message: 'Acesso negado.' });
+            }
+            const { data_horario } = req.body;
+            await AgendamentoDAO.criarHorario(data_horario, req.usuario.id);
+            res.status(201).json({ message: 'Horário criado com sucesso.' });
+        } catch (error) {
+            res.status(500).json({ message: 'Erro ao criar horário.' });
+        }
+    },
+    
+    
+    listarAlunos: async (req, res) => {
+        try {
+            
+            const pool = require('../config/db'); 
+            const [alunos] = await pool.query("SELECT id, nome FROM USUARIOS WHERE tipo_usuario_id = 3");
+            res.status(200).json(alunos);
+        } catch(error) {
+            res.status(500).json({ message: 'Erro ao listar alunos' });
+        }
     }
 };
 

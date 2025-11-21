@@ -47,7 +47,50 @@ const AgendamentoDAO = {
         } finally {
             connection.release();
         }
-    }
+    },
+
+    listarPorPerfil: async (usuarioId, tipoUsuarioId) => {
+        let sql = `
+            SELECT 
+                a.id, a.status, a.observacao, 
+                ts.nome_servico, 
+                hd.data_horario,
+                u_cliente.nome as nome_cliente,
+                u_cliente.email as email_cliente,
+                u_aluno.nome as nome_aluno
+            FROM AGENDAMENTOS a
+            JOIN TIPOS_SERVICO ts ON a.tipo_servico_id = ts.id
+            JOIN HORARIOS_DISPONIVEIS hd ON a.horario_id = hd.id
+            JOIN USUARIOS u_cliente ON a.usuario_id = u_cliente.id
+            LEFT JOIN USUARIOS u_aluno ON a.aluno_voluntario_id = u_aluno.id
+        `;
+
+        const params = [];
+
+       
+        if (tipoUsuarioId === 4) { 
+            
+            sql += ` WHERE a.usuario_id = ?`;
+            params.push(usuarioId);
+        } else if (tipoUsuarioId === 3) { 
+           
+            sql += ` WHERE a.aluno_voluntario_id = ?`;
+            params.push(usuarioId);
+        } 
+        
+
+        sql += ` ORDER BY hd.data_horario DESC`;
+
+        const [rows] = await pool.query(sql, params);
+        return rows;
+    },
+
+   
+    atribuirAluno: async (agendamentoId, alunoId) => {
+        const sql = `UPDATE AGENDAMENTOS SET aluno_voluntario_id = ? WHERE id = ?`;
+        const [result] = await pool.query(sql, [alunoId, agendamentoId]);
+        return result.affectedRows;
+    },
 };
 
 module.exports = AgendamentoDAO;

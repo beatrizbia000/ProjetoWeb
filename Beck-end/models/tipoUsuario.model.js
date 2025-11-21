@@ -1,4 +1,4 @@
-// Beck-end/models/tipoUsuario.model.js
+
 const TipoUsuarioDAO = require('../dao/tipoUsuario.dao');
 
 const TipoUsuarioModel = {
@@ -48,7 +48,7 @@ const TipoUsuarioModel = {
     } catch (error) {
       console.error('Erro na Model ao deletar tipo de usuário:', error);
       
-      // REGRA DE NEGÓCIO: Tratamento de erro específico continua aqui
+      
       if (error.code === 'ER_ROW_IS_REFERENCED_2') {
         throw new Error('Não é possível excluir. Este perfil está sendo usado por usuários.');
       }

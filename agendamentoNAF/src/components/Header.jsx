@@ -14,7 +14,7 @@ export default function Header() {
             </h1>
         </Link>
 
-        {/* BOTÃO MOBILE */}
+       
         <button
           className="md:hidden text-white focus:outline-none"
           onClick={() => setIsOpen(!isOpen)}
