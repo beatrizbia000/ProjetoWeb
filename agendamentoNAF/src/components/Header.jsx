@@ -7,9 +7,9 @@ export default function Header() {
   const navigate = useNavigate();
 
  
+const TIPO_ALUNO = 1;
   const TIPO_PROFESSOR = 2;
-  const TIPO_ADMIN = 1;
-  const TIPO_ALUNO = 3;
+  const TIPO_ADMIN = 3;
   const TIPO_MEI = 4;
 
   useEffect(() => {
