@@ -32,7 +32,6 @@ export default function MeusAgendamentos() {
     }
   };
 
-  
   const getStatusColor = (status) => {
     switch (status) {
       case 'agendado': return 'bg-yellow-100 text-yellow-800';
@@ -51,7 +50,8 @@ export default function MeusAgendamentos() {
         
         <div className="flex justify-between items-center mb-8">
           <h1 className="text-2xl font-bold text-gray-800">
-            {usuario?.tipo === 3 ? "Painel do Aluno" : "Meus Agendamentos"}
+          
+            {usuario?.tipo === 1 ? "Painel do Aluno" : "Meus Agendamentos"}
           </h1>
           <span className="bg-blue-100 text-blue-800 px-3 py-1 rounded-full text-sm font-semibold">
             Total: {agendamentos.length}
@@ -67,7 +67,6 @@ export default function MeusAgendamentos() {
             {agendamentos.map((item) => (
               <div key={item.id} className="bg-white p-6 rounded-xl shadow-sm border border-gray-100 hover:shadow-md transition flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
                 
-              
                 <div className="flex-grow">
                   <div className="flex items-center gap-2 mb-2">
                     <span className={`px-2 py-1 text-xs rounded uppercase font-bold ${getStatusColor(item.status)}`}>
@@ -78,26 +77,37 @@ export default function MeusAgendamentos() {
                   
                   <h3 className="text-lg font-bold text-gray-800 mb-1">{item.nome_servico}</h3>
                   
+                
                   <div className="flex items-center gap-2 text-gray-600 text-sm mb-2">
                     <FaCalendarAlt className="text-blue-500"/>
-                    {new Date(item.data_horario).toLocaleDateString('pt-BR')} às {new Date(item.data_horario).toLocaleTimeString('pt-BR', {hour: '2-digit', minute:'2-digit'})}
+                    <span className="font-medium">
+                        {new Date(item.data_horario).toLocaleDateString('pt-BR')}
+                    </span>
+                    <span>às</span>
+                    <span className="font-bold text-gray-800">
+                        {new Date(item.data_horario).toLocaleTimeString('pt-BR', {hour: '2-digit', minute:'2-digit'})}
+                    </span>
                   </div>
 
                   
-                  {usuario?.tipo === 3 && (
+                  {usuario?.tipo === 1 && (
                     <div className="mt-3 grid grid-cols-1 sm:grid-cols-2 gap-2 text-sm bg-gray-50 p-3 rounded-lg">
                         <div className="flex items-center gap-2">
                             <FaChalkboardTeacher className="text-purple-600"/>
-                            <span className="font-semibold">Professor:</span> {item.nome_professor}
+                            <span className="font-semibold">Professor:</span> {item.nome_professor || "Não atribuído"}
                         </div>
                         <div className="flex items-center gap-2">
                             <FaStore className="text-green-600"/>
                             <span className="font-semibold">Cliente:</span> {item.nome_cliente}
                         </div>
+                       
+                        <div className="col-span-2 text-xs text-gray-500 ml-6">
+                           Email cliente: {item.email_cliente}
+                        </div>
                     </div>
                   )}
 
-                
+                  
                   {usuario?.tipo === 4 && item.nome_aluno && (
                     <div className="mt-2 text-sm text-blue-600 flex items-center gap-2">
                         <FaUserTie /> 

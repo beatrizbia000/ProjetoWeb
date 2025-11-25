@@ -149,7 +149,7 @@ function NovoAgendamento() {
               </select>
             </div>
 
-            {/* Grid de Horários - AQUI MUDOU A EXIBIÇÃO */}
+            
             <div>
               <label className="block text-sm font-bold text-gray-700 mb-3 flex justify-between items-center">
                 <span>Horários e Professores Disponíveis</span>
