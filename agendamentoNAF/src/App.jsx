@@ -6,6 +6,7 @@ import Home from "./pages/Home";
 import ConfiguracoesConta from "./pages/ConfiguracoesConta";
 import NovoAgendamento from "./pages/NovoAgendamento"; 
 import PainelProfessor from "./pages/PainelProfessor";
+import PainelAdministrador from "./pages/PainelAdministrador";
 import MeusAgendamentos from "./pages/MeusAgendamentos";
 
 function App() {
@@ -18,6 +19,7 @@ function App() {
         <Route path="/perfil" element={<ConfiguracoesConta />} />
         <Route path="/novo-agendamento" element={<NovoAgendamento />} />
         <Route path="/painel-professor" element={<PainelProfessor />} />
+        <Route path="/painel-administrador" element={<PainelAdministrador />} />
         <Route path="/meus-agendamentos" element={<MeusAgendamentos />} />
       </Routes>
     </>

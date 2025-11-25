@@ -6,8 +6,8 @@ export default function Header() {
   const [usuario, setUsuario] = useState(null);
   const navigate = useNavigate();
 
- 
-const TIPO_ALUNO = 1;
+
+  const TIPO_ALUNO = 1;
   const TIPO_PROFESSOR = 2;
   const TIPO_ADMIN = 3;
   const TIPO_MEI = 4;
@@ -28,14 +28,14 @@ const TIPO_ALUNO = 1;
   return (
     <header className="w-full bg-[#004A8D] pb-0 shadow-md">
       <div className="flex items-center justify-between px-6 h-20">
-        
-       <Link to="/home" className="hover:opacity-80 transition-opacity">
-            <h1 className="text-white text-2xl font-semibold cursor-pointer">
-                Agendamentos NAF
-            </h1>
+
+        <Link to="/home" className="hover:opacity-80 transition-opacity">
+          <h1 className="text-white text-2xl font-semibold cursor-pointer">
+            Agendamentos NAF
+          </h1>
         </Link>
 
-        
+
         <button
           className="md:hidden text-white focus:outline-none"
           onClick={() => setIsOpen(!isOpen)}
@@ -45,20 +45,26 @@ const TIPO_ALUNO = 1;
           </svg>
         </button>
 
-        
+
         <nav className="hidden md:flex items-center gap-8">
-          
-         
+
+
           {usuario?.tipo === TIPO_MEI && (
             <Link to="/novo-agendamento" className="text-white font-medium hover:text-blue-200 transition">
               Novo Agendamento
             </Link>
           )}
 
-          
-          {(usuario?.tipo === TIPO_PROFESSOR || usuario?.tipo === TIPO_ADMIN) && (
+
+          {(usuario?.tipo === TIPO_PROFESSOR) && (
             <Link to="/painel-professor" className="text-white font-medium hover:text-blue-200 transition">
               Painel do Professor
+            </Link>
+          )}
+
+          {(usuario?.tipo === TIPO_ADMIN) && (
+            <Link to="/painel-administrador" className="text-white font-medium hover:text-blue-200 transition">
+              Painel do Administrador
             </Link>
           )}
 
@@ -78,18 +84,21 @@ const TIPO_ALUNO = 1;
         </nav>
       </div>
 
-      
+
       {isOpen && (
         <div className="md:hidden bg-[#005a9c] border-t border-white/10">
           <nav className="flex flex-col items-start gap-4 p-6">
             {usuario?.tipo === TIPO_MEI && (
-                <Link to="/novo-agendamento" className="text-white font-medium" onClick={() => setIsOpen(false)}>Novo Agendamento</Link>
+              <Link to="/novo-agendamento" className="text-white font-medium" onClick={() => setIsOpen(false)}>Novo Agendamento</Link>
             )}
             {(usuario?.tipo === TIPO_PROFESSOR || usuario?.tipo === TIPO_ADMIN) && (
-                <Link to="/painel-professor" className="text-white font-medium" onClick={() => setIsOpen(false)}>Painel do Professor</Link>
+              <Link to="/painel-professor" className="text-white font-medium" onClick={() => setIsOpen(false)}>Painel do Professor</Link>
+            )}
+            {usuario?.tipo === TIPO_ADMIN && (
+              <Link to="/painel-administrador" className="text-white font-medium hover:text-blue-200 transition" onClick={() => setIsOpen(false)}>Painel do Administrador</Link>
             )}
             {(usuario?.tipo === TIPO_ALUNO || usuario?.tipo === TIPO_MEI) && (
-                <Link to="/meus-agendamentos" className="text-white font-medium" onClick={() => setIsOpen(false)}>Histórico</Link>
+              <Link to="/meus-agendamentos" className="text-white font-medium" onClick={() => setIsOpen(false)}>Histórico</Link>
             )}
             <Link to="/perfil" className="text-white font-medium" onClick={() => setIsOpen(false)}>Meu Perfil</Link>
             <button onClick={handleLogout} className="text-red-300 font-medium text-left">Sair</button>

@@ -42,6 +42,7 @@ export default function Home() {
             {usuario.tipo === TIPO_MEI && "Bem-vindo ao seu painel de agendamentos."}
             {usuario.tipo === TIPO_PROFESSOR && "Bem-vindo ao painel de gestão do NAF."}
             {usuario.tipo === TIPO_ALUNO && "Bem-vindo à sua área de estágio/voluntariado."}
+            {usuario.tipo === TIPO_ADMIN && "Bem-vindo à sua área de gestão do sistema."}
           </p>
         </section>
 
@@ -59,13 +60,23 @@ export default function Home() {
           )}
 
          
-          {(usuario.tipo === TIPO_PROFESSOR || usuario.tipo === TIPO_ADMIN) && (
+          {(usuario.tipo === TIPO_PROFESSOR) && (
             <div onClick={() => navigate("/painel-professor")} className="group bg-white p-8 rounded-2xl shadow-sm hover:shadow-xl border border-yellow-100 border-l-4 border-l-yellow-400 cursor-pointer transition-all">
               <div className="mb-5 w-16 h-16 bg-yellow-50 rounded-xl flex items-center justify-center text-yellow-600">
                 <FaChalkboardTeacher size={32} />
               </div>
               <h3 className="text-xl font-bold text-gray-800">Painel do Professor</h3>
               <p className="text-gray-500 text-sm">Gerencie solicitações e atribua alunos.</p>
+            </div>
+          )}
+
+          {(usuario.tipo === TIPO_ADMIN) && (
+            <div onClick={() => navigate("/painel-administrador")} className="group bg-white p-8 rounded-2xl shadow-sm hover:shadow-xl border border-yellow-100 border-l-4 border-l-yellow-400 cursor-pointer transition-all">
+              <div className="mb-5 w-16 h-16 bg-yellow-50 rounded-xl flex items-center justify-center text-yellow-600">
+                <FaChalkboardTeacher size={32} />
+              </div>
+              <h3 className="text-xl font-bold text-gray-800">Painel do Administrador</h3>
+              <p className="text-gray-500 text-sm">Gerencie o sistema</p>
             </div>
           )}
 
