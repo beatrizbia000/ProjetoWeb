@@ -1,4 +1,3 @@
-
 const pool = require('../config/db');
 
 const UsuarioDAO = {
@@ -20,14 +19,14 @@ const UsuarioDAO = {
     },
 
     selectById: async (id) => {
-        const sql = `SELECT id, nome, email, cnpj, cpf, tipo_usuario_id, status_bloqueio 
+        // ADICIONADO: campo 'senha' aqui para permitir validação de token de recuperação
+        const sql = `SELECT id, nome, email, senha, cnpj, cpf, tipo_usuario_id, status_bloqueio 
                      FROM USUARIOS WHERE id = ?`;
         const [rows] = await pool.query(sql, [id]);
         return rows[0];
     },
 
     selectAll: async () => {
-       
         const sql = `SELECT id, nome, email, tipo_usuario_id FROM USUARIOS`; 
         const [rows] = await pool.query(sql);
         return rows;
@@ -36,6 +35,12 @@ const UsuarioDAO = {
     update: async (id, dados) => {
         const sql = `UPDATE USUARIOS SET nome = ?, email = ?, cpf = ?, cnpj = ? WHERE id = ?`;
         const [result] = await pool.query(sql, [dados.nome, dados.email, dados.cpf, dados.cnpj, id]);
+        return result;
+    },
+
+    updateSenha: async (id, novaSenha) => {
+        const sql = `UPDATE USUARIOS SET senha = ? WHERE id = ?`;
+        const [result] = await pool.query(sql, [novaSenha, id]);
         return result;
     }
 };

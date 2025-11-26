@@ -52,6 +52,42 @@ const AgendamentoDAO = {
         }
     },
 
+    cancelar: async (id) => {
+        const connection = await pool.getConnection();
+        try {
+            await connection.beginTransaction();
+
+            const [agendamento] = await connection.query(
+                'SELECT horario_id FROM AGENDAMENTOS WHERE id = ?', 
+                [id]
+            );
+
+            if (agendamento.length === 0) {
+                throw new Error('Agendamento não encontrado');
+            }
+
+            const horarioId = agendamento[0].horario_id;
+
+            await connection.query(
+                "UPDATE AGENDAMENTOS SET status = 'cancelado' WHERE id = ?", 
+                [id]
+            );
+
+            await connection.query(
+                "UPDATE HORARIOS_DISPONIVEIS SET status = 'Disponível' WHERE id = ?", 
+                [horarioId]
+            );
+
+            await connection.commit();
+            return true;
+        } catch (error) {
+            await connection.rollback();
+            throw error;
+        } finally {
+            connection.release();
+        }
+    },
+
     listarPorPerfil: async (usuarioId, tipoUsuarioId) => {
         let sql = `
             SELECT 

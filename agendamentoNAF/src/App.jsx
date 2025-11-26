@@ -10,6 +10,8 @@ import PainelAdministrador from "./pages/PainelAdministrador";
 import MeusAgendamentos from "./pages/MeusAgendamentos";
 import GerenciarHorarios from "./pages/GerenciarHorarios";
 import GerenciarServicos from "./pages/GerenciarServicos";
+import EsqueciSenha from "./pages/EsqueciSenha";
+import RedefinirSenha from "./pages/RedefinirSenha";
 
 function App() {
   return (
@@ -25,6 +27,8 @@ function App() {
         <Route path="/meus-agendamentos" element={<MeusAgendamentos />} />
         <Route path="/gerenciar-horarios" element={<GerenciarHorarios />} />
         <Route path="/gerenciar-servicos" element={<GerenciarServicos />} />
+        <Route path="/esqueci-senha" element={<EsqueciSenha />} />
+        <Route path="/redefinir-senha/:id/:token" element={<RedefinirSenha />} />
       </Routes>
     </>
   );

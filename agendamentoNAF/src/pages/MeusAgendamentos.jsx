@@ -1,14 +1,12 @@
 import React, { useState, useEffect } from "react";
-import axios from "axios";
+import api from "../services/api"; // Usando o serviço centralizado
 import Header from "../components/Header";
-import { FaCalendarAlt, FaUserTie, FaChalkboardTeacher, FaStore } from "react-icons/fa";
+import { FaCalendarAlt, FaUserTie, FaChalkboardTeacher, FaStore, FaTimesCircle } from "react-icons/fa";
 
 export default function MeusAgendamentos() {
   const [agendamentos, setAgendamentos] = useState([]);
   const [loading, setLoading] = useState(true);
   const [usuario, setUsuario] = useState(null);
-
-  const API_URL = "http://localhost:3001/api";
 
   useEffect(() => {
     const usuarioSalvo = localStorage.getItem("usuario");
@@ -21,7 +19,8 @@ export default function MeusAgendamentos() {
   const carregarAgendamentos = async () => {
     const token = localStorage.getItem("token");
     try {
-      const response = await axios.get(`${API_URL}/agendamentos/meus-agendamentos`, {
+      // Alterado para usar 'api'
+      const response = await api.get(`/agendamentos/meus-agendamentos`, {
         headers: { Authorization: `Bearer ${token}` }
       });
       setAgendamentos(response.data);
@@ -29,6 +28,26 @@ export default function MeusAgendamentos() {
       console.error("Erro ao buscar agendamentos:", error);
     } finally {
       setLoading(false);
+    }
+  };
+
+  const handleCancelar = async (id) => {
+    if (!window.confirm("Tem certeza que deseja cancelar este agendamento? O horário será liberado novamente.")) return;
+    
+    const token = localStorage.getItem("token");
+    try {
+        // Alterado para usar 'api'
+        await api.put(`/agendamentos/${id}/cancelar`, {}, {
+            headers: { Authorization: `Bearer ${token}` }
+        });
+        
+        setAgendamentos(prev => prev.map(item => 
+            item.id === id ? { ...item, status: 'cancelado' } : item
+        ));
+        alert("Agendamento cancelado com sucesso!");
+    } catch (error) {
+        alert("Erro ao cancelar agendamento.");
+        console.error(error);
     }
   };
 
@@ -50,7 +69,6 @@ export default function MeusAgendamentos() {
         
         <div className="flex justify-between items-center mb-8">
           <h1 className="text-2xl font-bold text-gray-800">
-          
             {usuario?.tipo === 1 ? "Painel do Aluno" : "Meus Agendamentos"}
           </h1>
           <span className="bg-blue-100 text-blue-800 px-3 py-1 rounded-full text-sm font-semibold">
@@ -77,7 +95,6 @@ export default function MeusAgendamentos() {
                   
                   <h3 className="text-lg font-bold text-gray-800 mb-1">{item.nome_servico}</h3>
                   
-                
                   <div className="flex items-center gap-2 text-gray-600 text-sm mb-2">
                     <FaCalendarAlt className="text-blue-500"/>
                     <span className="font-medium">
@@ -89,7 +106,6 @@ export default function MeusAgendamentos() {
                     </span>
                   </div>
 
-                  
                   {usuario?.tipo === 1 && (
                     <div className="mt-3 grid grid-cols-1 sm:grid-cols-2 gap-2 text-sm bg-gray-50 p-3 rounded-lg">
                         <div className="flex items-center gap-2">
@@ -100,14 +116,12 @@ export default function MeusAgendamentos() {
                             <FaStore className="text-green-600"/>
                             <span className="font-semibold">Cliente:</span> {item.nome_cliente}
                         </div>
-                       
                         <div className="col-span-2 text-xs text-gray-500 ml-6">
                            Email cliente: {item.email_cliente}
                         </div>
                     </div>
                   )}
 
-                  
                   {usuario?.tipo === 4 && item.nome_aluno && (
                     <div className="mt-2 text-sm text-blue-600 flex items-center gap-2">
                         <FaUserTie /> 
@@ -115,6 +129,15 @@ export default function MeusAgendamentos() {
                     </div>
                   )}
                 </div>
+
+                {usuario?.tipo === 4 && item.status === 'agendado' && (
+                    <button 
+                        onClick={() => handleCancelar(item.id)}
+                        className="flex items-center gap-2 text-red-600 hover:text-red-800 border border-red-200 px-4 py-2 rounded-lg hover:bg-red-50 transition text-sm font-bold"
+                    >
+                        <FaTimesCircle /> Cancelar
+                    </button>
+                )}
 
               </div>
             ))}

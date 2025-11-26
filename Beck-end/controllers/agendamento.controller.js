@@ -40,6 +40,17 @@ const AgendamentoController = {
         }
     },
 
+    cancelarAgendamento: async (req, res) => {
+        try {
+            const { id } = req.params;
+            await AgendamentoDAO.cancelar(id);
+            res.status(200).json({ message: 'Agendamento cancelado e horário liberado com sucesso!' });
+        } catch (error) {
+            console.error(error);
+            res.status(500).json({ message: 'Erro ao cancelar agendamento.' });
+        }
+    },
+
     atribuirAluno: async (req, res) => {
         try {
             if (req.usuario.tipo > 2) {
@@ -72,7 +83,6 @@ const AgendamentoController = {
 
     atualizarStatus: async (req, res) => {
         try {
-            
             if (req.usuario.tipo !== 2 && req.usuario.tipo !== 3) {
                 return res.status(403).json({ message: 'Acesso negado.' });
             }
@@ -90,7 +100,6 @@ const AgendamentoController = {
     
     listarAlunos: async (req, res) => {
         try {
-            
             const alunos = await AgendamentoDAO.listarAlunos();
             res.status(200).json(alunos);
         } catch(error) {
