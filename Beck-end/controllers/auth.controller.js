@@ -89,7 +89,8 @@ const AuthController = {
         const token = jwt.sign({ email: user.email, id: user.id }, secret, { expiresIn: '15m' });
 
         const frontendUrl = process.env.FRONTEND_URL || 'http://localhost:5173';
-        const link = `${frontendUrl}/redefinir-senha/${user.id}/${token}`;
+        // CORREÇÃO AQUI: Adicionado /#/
+        const link = `${frontendUrl}/#/redefinir-senha/${user.id}/${token}`;
 
         const mailOptions = {
             from: 'agendamentonaf@gmail.com',
