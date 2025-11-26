@@ -1,21 +1,19 @@
 const pool = require('../config/db');
 
-
 const ID_ALUNO = 1;
 const ID_PROFESSOR = 2;
 const ID_ADMIN = 3;
 const ID_MEI = 4;
 
 const AgendamentoDAO = {
-    
-    
     listarHorariosDisponiveis: async () => {
         const sql = `
-            SELECT id, data_horario 
-            FROM HORARIOS_DISPONIVEIS 
-            WHERE status = 'Disponível' 
-            AND data_horario > NOW() 
-            ORDER BY data_horario ASC
+            SELECT h.id, h.data_horario, u.nome as nome_professor
+            FROM HORARIOS_DISPONIVEIS h
+            JOIN USUARIOS u ON h.criado_por_id = u.id
+            WHERE h.status = 'Disponível' 
+            AND h.data_horario > NOW() 
+            ORDER BY h.data_horario ASC
         `;
         const [rows] = await pool.query(sql);
         return rows;
@@ -74,20 +72,14 @@ const AgendamentoDAO = {
 
         const params = [];
 
-       
         if (tipoUsuarioId === ID_MEI) { 
-            
             sql += ` WHERE a.usuario_id = ?`;
             params.push(usuarioId);
-
         } else if (tipoUsuarioId === ID_ALUNO) { 
-            
             sql += ` WHERE a.aluno_voluntario_id = ?`;
             params.push(usuarioId);
-
         } 
      
-
         sql += ` ORDER BY hd.data_horario DESC`;
 
         const [rows] = await pool.query(sql, params);
@@ -100,7 +92,6 @@ const AgendamentoDAO = {
         return result.affectedRows;
     },
 
-    
     criarHorario: async (data_horario, criado_por_id) => {
         const sql = `INSERT INTO HORARIOS_DISPONIVEIS (data_horario, status, criado_por_id) VALUES (?, 'Disponível', ?)`;
         const [result] = await pool.query(sql, [data_horario, criado_por_id]);
