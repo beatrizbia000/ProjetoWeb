@@ -1,18 +1,19 @@
 import React, { useState, useEffect } from "react";
 import axios from "axios";
+import { useNavigate } from "react-router-dom"; // Importação adicionada
 import Header from "../components/Header";
 import { 
   FaUserGraduate, FaCheckCircle, FaExclamationCircle, FaEdit, FaCheck, FaTimes, FaSave
 } from "react-icons/fa";
 
 export default function PainelProfessor() {
+  const navigate = useNavigate(); // Hook inicializado
   const [agendamentos, setAgendamentos] = useState([]);
   const [alunos, setAlunos] = useState([]);
   const [loading, setLoading] = useState(true);
   const [mensagem, setMensagem] = useState({ tipo: "", texto: "" });
   const [selecoesPendentes, setSelecoesPendentes] = useState({});
   
- 
   const [editandoId, setEditandoId] = useState(null);
   const [alunoEditadoId, setAlunoEditadoId] = useState("");
 
@@ -97,7 +98,16 @@ export default function PainelProfessor() {
       <Header />
       
       <main className="max-w-6xl mx-auto p-6">
-        <h1 className="text-3xl font-bold text-gray-800 mb-6">Painel do Professor</h1>
+        {/* Cabeçalho Flexível com Botão de Gestão */}
+        <div className="flex flex-col md:flex-row justify-between items-center mb-6 gap-4">
+            <h1 className="text-3xl font-bold text-gray-800">Painel do Professor</h1>
+            <button 
+                onClick={() => navigate("/gerenciar-horarios")}
+                className="bg-indigo-600 text-white px-4 py-2 rounded-lg hover:bg-indigo-700 transition shadow flex items-center gap-2"
+            >
+                Gerenciar Horários
+            </button>
+        </div>
 
         {mensagem.texto && (
           <div className={`mb-6 p-4 rounded-lg flex items-center gap-2 ${mensagem.tipo === 'sucesso' ? 'bg-green-100 text-green-700' : 'bg-red-100 text-red-700'}`}>

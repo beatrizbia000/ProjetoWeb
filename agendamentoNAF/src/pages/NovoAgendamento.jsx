@@ -3,17 +3,13 @@ import { useNavigate } from "react-router-dom";
 import axios from "axios";
 import Header from "../components/Header";
 import {
-  FaStore, FaUserGraduate, FaChalkboardTeacher, FaUserShield, FaInfoCircle, FaClock
+  FaStore, FaInfoCircle, FaClock
 } from "react-icons/fa";
 
 function NovoAgendamento() {
   const navigate = useNavigate();
   const API_URL = "http://localhost:3001/api";
 
-
-  const PERFIL_ALUNO = 1;
-  const PERFIL_PROFESSOR = 2;
-  const PERFIL_ADMIN = 3;
   const PERFIL_MEI = 4;
 
   const [usuario, setUsuario] = useState(null);
@@ -149,7 +145,6 @@ function NovoAgendamento() {
               </select>
             </div>
 
-            
             <div>
               <label className="block text-sm font-bold text-gray-700 mb-3 flex justify-between items-center">
                 <span>Horários e Professores Disponíveis</span>
@@ -189,10 +184,12 @@ function NovoAgendamento() {
 
                         <div className={`h-px w-full my-2 ${isSelected ? 'bg-white/30' : 'bg-gray-100'}`}></div>
 
-                        {/* REMOVIDO O NOME DO PROFESSOR */}
                         <div className="text-center">
-                          <span className={`text-xs font-medium ${isSelected ? 'text-blue-200' : 'text-green-600'}`}>
-                            Disponível
+                          <p className={`text-[10px] uppercase tracking-wide mb-1 ${isSelected ? 'text-blue-200' : 'text-gray-400'}`}>
+                            Professor(a)
+                          </p>
+                          <span className={`text-xs font-bold ${isSelected ? 'text-white' : 'text-gray-800'}`}>
+                            {horario.nome_professor}
                           </span>
                         </div>
                       </div>

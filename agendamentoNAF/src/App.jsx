@@ -8,6 +8,8 @@ import NovoAgendamento from "./pages/NovoAgendamento";
 import PainelProfessor from "./pages/PainelProfessor";
 import PainelAdministrador from "./pages/PainelAdministrador";
 import MeusAgendamentos from "./pages/MeusAgendamentos";
+import GerenciarHorarios from "./pages/GerenciarHorarios";
+import GerenciarServicos from "./pages/GerenciarServicos";
 
 function App() {
   return (
@@ -21,6 +23,8 @@ function App() {
         <Route path="/painel-professor" element={<PainelProfessor />} />
         <Route path="/painel-administrador" element={<PainelAdministrador />} />
         <Route path="/meus-agendamentos" element={<MeusAgendamentos />} />
+        <Route path="/gerenciar-horarios" element={<GerenciarHorarios />} />
+        <Route path="/gerenciar-servicos" element={<GerenciarServicos />} />
       </Routes>
     </>
   );
