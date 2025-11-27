@@ -1,11 +1,13 @@
 import React, { useState } from "react";
-import { useNavigate, Link } from "react-router-dom";
-import api from "../services/api"; // <--- IMPORTANTE
+import { useNavigate, Link } from "react-router-dom"; // Importa Link
+import api from "../services/api"; // Usa a API centralizada
 
 export default function Login() {
+  
   const [email, setEmail] = useState(""); 
   const [senha, setSenha] = useState("");
   const [error, setError] = useState(null);
+  
   const navigate = useNavigate();
 
   const handleSubmit = async (e) => {
@@ -13,7 +15,7 @@ export default function Login() {
     setError(null); 
 
     try {
-      // CORRIGIDO: api.post e rota relativa
+      // Usa api.post (pega a URL do api.js)
       const response = await api.post('/auth/login', {
         email: email, 
         senha: senha,
@@ -40,10 +42,16 @@ export default function Login() {
 
   return (
     <div className="min-h-screen bg-bg-login flex items-center justify-center p-4 relative">
-      <div className="bg-white rounded-2xl shadow-[0px_4px_10px_1px_rgba(0,0,0,0.48)] w-full max-w-[850px] relative flex flex-col md:flex-row overflow-hidden">
+      <div className="bg-white rounded-2xl shadow-lg w-full max-w-[850px] relative flex flex-col md:flex-row overflow-hidden">
+        {/* CONTEÚDO */}
         <div className="flex flex-col gap-6 grow px-10 py-10 relative md:w-[500px]">
+          {/* ÍCONE + TÍTULO */}
           <div className="flex flex-col items-center text-center">
-            <img className="w-16 h-16 mb-2" src="/img/icone-agendamentos.png" alt="icone" />
+            <img
+              className="w-16 h-16 mb-2"
+              src="/img/icone-agendamentos.png"
+              alt="icone"
+            />
             <h1 className="text-black text-2xl font-bold font-['Inter'] md:text-left text-center">
               Acesso ao Agendamentos NAF
             </h1>
@@ -53,15 +61,33 @@ export default function Login() {
             </p>
           </div>
 
-          <form className="flex flex-col gap-4  w-full" onSubmit={handleSubmit}>
+          {/* FORMULÁRIO */}
+          <form className="flex flex-col gap-4 w-full" onSubmit={handleSubmit}>
             <div className="flex flex-col gap-1">
-              <label className="text-black text-base font-medium font-['Inter']">Email</label>
-              <input className="px-3 py-2 bg-indigo-50 rounded-[20px] outline outline-1 outline-stone-300" type="email" value={email} onChange={(e) => setEmail(e.target.value)} required />
+              <label className="text-black text-base font-medium font-['Inter']">
+                Email
+              </label>
+              <input
+                className="px-3 py-2 bg-indigo-50 rounded-[20px] outline outline-1 outline-stone-300"
+                type="email"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                required
+              />
             </div>
 
             <div className="flex flex-col gap-1">
-              <label className="text-black text-base font-medium font-['Inter']">Senha</label>
-              <input className="px-3 py-2 bg-indigo-50 rounded-[20px] outline outline-1 outline-stone-300 " type="password" value={senha} onChange={(e) => setSenha(e.target.value)} required />
+              <label className="text-black text-base font-medium font-['Inter']">
+                Senha
+              </label>
+              <input
+                className="px-3 py-2 bg-indigo-50 rounded-[20px] outline outline-1 outline-stone-300 "
+                type="password"
+                value={senha}
+                onChange={(e) => setSenha(e.target.value)}
+                required
+              />
+              {/* Link para Esqueci Minha Senha */}
               <div className="text-right mt-1">
                 <Link to="/esqueci-senha" class="text-xs text-blue-600 hover:underline font-medium">
                     Esqueci minha senha
@@ -69,22 +95,38 @@ export default function Login() {
               </div>
             </div>
 
-            {error && <p className="text-red-600 text-sm text-center">{error}</p>}
+            {/* Exibe a mensagem de erro */}
+            {error && (
+              <p className="text-red-600 text-sm text-center">{error}</p>
+            )}
 
-            <button type="submit" className="bg-blue-700 text-white text-base font-medium font-['Inter'] py-3 rounded-[20px] w-full cursor-pointer hover:bg-blue-800 transition-colors">
+            {/* BOTÃO */}
+            <button
+              type="submit"
+              className="bg-blue-700 text-white text-base font-medium font-['Inter'] py-3 rounded-[20px] w-full cursor-pointer hover:bg-blue-800 transition-colors"
+            >
               Acessar
             </button>
           </form>
 
+          {/* LINK CADASTRO CORRIGIDO */}
           <div className="flex flex-col items-center text-sm mt-1">
             <span className="text-zinc-500 font-medium font-['Inter']">
               Ainda não possui conta?{" "}
-              <a className="text-black text-sm font-medium  " href="/cadastro">Cadastre-se</a>
+              <Link className="text-black text-sm font-medium hover:underline" to="/cadastro">
+                Cadastre-se
+              </Link>
             </span>
           </div>
         </div>
+
+        {/* IMAGEM */}
         <div className="md:w-[350px] w-full h-[250px] md:h-auto">
-          <img className="w-full h-full object-cover object-left" src="/img/img_tela_login.png" alt="login" />
+          <img
+            className="w-full h-full object-cover object-left" 
+            src="/img/img_tela_login.png"
+            alt="login"
+          />
         </div>
       </div>
     </div>
