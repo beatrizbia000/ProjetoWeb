@@ -1,13 +1,9 @@
 const pool = require('../config/db');
 
 const UsuarioDAO = {
-  
     insert: async (dadosUsuario) => {
         const { nome, email, senha, cnpj, cpf, tipo_usuario_id } = dadosUsuario;
-        
-        const sql = `INSERT INTO USUARIOS (nome, email, senha, cnpj, cpf, tipo_usuario_id) 
-                     VALUES (?, ?, ?, ?, ?, ?)`;
-                     
+        const sql = `INSERT INTO USUARIOS (nome, email, senha, cnpj, cpf, tipo_usuario_id) VALUES (?, ?, ?, ?, ?, ?)`;
         const [result] = await pool.query(sql, [nome, email, senha, cnpj, cpf, tipo_usuario_id]);
         return result;
     },
@@ -19,9 +15,8 @@ const UsuarioDAO = {
     },
 
     selectById: async (id) => {
-        // ADICIONADO: campo 'senha' aqui para permitir validação de token de recuperação
-        const sql = `SELECT id, nome, email, senha, cnpj, cpf, tipo_usuario_id, status_bloqueio 
-                     FROM USUARIOS WHERE id = ?`;
+        // CORREÇÃO: Incluído o campo 'senha'
+        const sql = `SELECT id, nome, email, senha, cnpj, cpf, tipo_usuario_id, status_bloqueio FROM USUARIOS WHERE id = ?`;
         const [rows] = await pool.query(sql, [id]);
         return rows[0];
     },

@@ -16,20 +16,15 @@ const AuthController = {
   register: async (req, res) => {
     try {
       const { nome, email, senha, cnpj, cpf, tipo_usuario_id } = req.body;
-
       if (!nome || !email || !senha || !tipo_usuario_id) {
         return res.status(400).json({ message: 'Campos obrigatórios faltando.' });
       }
-
       const existingUser = await UsuarioModel.findByEmail(email);
       if (existingUser) {
         return res.status(409).json({ message: 'Este email já está cadastrado.' });
       }
-
       const newUser = await UsuarioModel.create({ nome, email, senha, cnpj, cpf, tipo_usuario_id });
-
       res.status(201).json({ message: 'Usuário criado com sucesso!', usuario: newUser });
-
     } catch (error) {
       res.status(500).json({ message: 'Erro no servidor ao tentar registrar.', error: error.message });
     }
@@ -38,42 +33,20 @@ const AuthController = {
   login: async (req, res) => {
     try {
       const { email, senha } = req.body;
-
       const user = await UsuarioModel.findByEmail(email);
-      if (!user) {
-        return res.status(404).json({ message: 'Email ou senha inválidos.' }); 
-      }
-
+      if (!user) return res.status(404).json({ message: 'Email ou senha inválidos.' }); 
+      
       const isMatch = await bcrypt.compare(senha, user.senha);
-      if (!isMatch) {
-        return res.status(401).json({ message: 'Email ou senha inválidos.' });
-      }
+      if (!isMatch) return res.status(401).json({ message: 'Email ou senha inválidos.' });
 
       if (user.status_bloqueio) {
-          return res.status(403).json({ 
-              message: 'Usuário bloqueado.', 
-              data_fim_bloqueio: user.data_fim_bloqueio 
-          });
+          return res.status(403).json({ message: 'Usuário bloqueado.', data_fim_bloqueio: user.data_fim_bloqueio });
       }
 
-      const payload = {
-        id: user.id,
-        nome: user.nome,
-        tipo: user.tipo_usuario_id
-      };
-      
-      const token = jwt.sign(
-        payload,
-        process.env.JWT_SECRET,
-        { expiresIn: '8h' } 
-      );
+      const payload = { id: user.id, nome: user.nome, tipo: user.tipo_usuario_id };
+      const token = jwt.sign(payload, process.env.JWT_SECRET, { expiresIn: '8h' });
 
-      res.status(200).json({
-        message: 'Login bem-sucedido!',
-        token: token,
-        usuario: payload
-      });
-
+      res.status(200).json({ message: 'Login bem-sucedido!', token: token, usuario: payload });
     } catch (error) {
       res.status(500).json({ message: 'Erro no servidor ao tentar logar.', error: error.message });
     }
@@ -89,7 +62,8 @@ const AuthController = {
         const token = jwt.sign({ email: user.email, id: user.id }, secret, { expiresIn: '15m' });
 
         const frontendUrl = process.env.FRONTEND_URL || 'http://localhost:5173';
-        // CORREÇÃO AQUI: Adicionado /#/
+        
+        // CORREÇÃO CRUCIAL: ADICIONADO /#/ PARA O HASHROUTER FUNCIONAR
         const link = `${frontendUrl}/#/redefinir-senha/${user.id}/${token}`;
 
         const mailOptions = {
@@ -104,12 +78,12 @@ const AuthController = {
                 await transporter.sendMail(mailOptions);
                 console.log("Email enviado para " + email);
             } else {
-                throw new Error("Sem credenciais de email");
+                throw new Error("Sem credenciais");
             }
         } catch (mailError) {
-            console.log("\n=== LINK DE RECUPERAÇÃO (Modo Debug) ===");
+            console.log("\n=== LINK DE RECUPERAÇÃO (Copie e cole no navegador) ===");
             console.log(link);
-            console.log("========================================\n");
+            console.log("=======================================================\n");
         }
 
         res.status(200).json({ message: "Se o e-mail existir, um link foi enviado." });
@@ -121,6 +95,7 @@ const AuthController = {
   redefinirSenha: async (req, res) => {
     const { id, token, novaSenha } = req.body;
     try {
+        // CORREÇÃO: Traz a senha do banco para validar o token
         const user = await UsuarioModel.findById(id);
         if (!user) return res.status(404).json({ message: "Usuário inválido." });
 
