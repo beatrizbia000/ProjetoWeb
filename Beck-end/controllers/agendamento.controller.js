@@ -70,9 +70,21 @@ const AgendamentoController = {
     criarHorario: async (req, res) => {
         try {
            if (req.usuario.tipo !== 2 && req.usuario.tipo !== 3) { 
-        return res.status(403).json({ message: 'Acesso negado.' });
-    }
-            const { data_horario } = req.body;
+                return res.status(403).json({ message: 'Acesso negado.' });
+           }
+            
+            let { data_horario } = req.body;
+            
+            // CORREÇÃO: Formata para o padrão do MySQL (YYYY-MM-DD HH:mm:ss)
+            // Remove o 'T' do input HTML
+            if (data_horario) {
+                data_horario = data_horario.replace('T', ' ');
+                // Se vier sem segundos (16 chars), adiciona :00
+                if (data_horario.length === 16) {
+                    data_horario += ':00';
+                }
+            }
+
             await AgendamentoDAO.criarHorario(data_horario, req.usuario.id);
             res.status(201).json({ message: 'Horário criado com sucesso.' });
         } catch (error) {

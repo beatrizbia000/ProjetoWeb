@@ -25,14 +25,12 @@ export default function GerenciarHorarios() {
     e.preventDefault();
     const token = localStorage.getItem("token");
 
-    // CORREÇÃO DE FUSO HORÁRIO: Criar data baseada no input e converter para ISO
-    const dataObj = new Date(dataHorario);
-    const dataISO = dataObj.toISOString(); 
-
     try {
+      // CORREÇÃO: Envia o valor direto do input (YYYY-MM-DDTHH:mm)
+      // O Backend vai tratar de remover o T. Isso evita mudar o fuso horário.
       await api.post(
         '/agendamentos/horario',
-        { data_horario: dataISO },
+        { data_horario: dataHorario },
         { headers: { Authorization: `Bearer ${token}` } }
       );
       setMensagem({ tipo: "sucesso", texto: "Horário criado com sucesso!" });
@@ -85,7 +83,8 @@ export default function GerenciarHorarios() {
               {horarios.map((h) => (
                 <li key={h.id} className="p-3 border rounded bg-gray-50 flex justify-between items-center text-sm">
                   <span>
-                    {new Date(h.data_horario).toLocaleDateString('pt-BR')} às {new Date(h.data_horario).toLocaleTimeString('pt-BR', {hour: '2-digit', minute:'2-digit'})}
+                    {/* Como agora recebemos string pura do banco, convertemos suavemente */}
+                    {new Date(h.data_horario.replace(' ', 'T')).toLocaleDateString('pt-BR')} às {new Date(h.data_horario.replace(' ', 'T')).toLocaleTimeString('pt-BR', {hour: '2-digit', minute:'2-digit'})}
                   </span>
                 </li>
               ))}
